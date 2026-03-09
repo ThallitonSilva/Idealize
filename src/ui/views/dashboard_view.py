@@ -11,8 +11,6 @@ class DashboardView(BaseView):
         super().__init__(page, "/", "Dashboard")
 
     def build_content(self):
-        user = self.page.session.get("user")
-
         conn = get_db_connection()
         c = conn.cursor()
 
@@ -70,7 +68,7 @@ class DashboardView(BaseView):
 
         return ft.Container(
             content=ft.ListView([
-                ft.Text(f"Welcome back, {user['username']}!", size=30, weight=ft.FontWeight.BOLD),
+                ft.Text(f"Welcome back, {self.username}!", size=30, weight=ft.FontWeight.BOLD),
                 ft.Divider(),
                 ft.Row([
                     self._create_metric_card("Total Revenue", f"R$ {revenue:,.2f}", ft.icons.MONEY, ft.colors.GREEN_700),

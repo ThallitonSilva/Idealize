@@ -31,16 +31,27 @@ class AppRouter:
     def route_change(self, route):
         self.page.views.clear()
 
-        # Check authentication
-        user_session = self.page.session.get("user")
+        from database import get_db_connection
 
-        if not user_session and self.page.route != "/login":
+        # Check authentication
+        user_id = self.page.session.get("user_id")
+
+        if not user_id and self.page.route != "/login":
             self.page.go("/login")
             return
 
+        role = None
+        if user_id:
+            conn = get_db_connection()
+            c = conn.cursor()
+            c.execute("SELECT role FROM users WHERE id = ?", (user_id,))
+            user_row = c.fetchone()
+            conn.close()
+            role = user_row['role'] if user_row else None
+
         # Role-based route protection
         admin_only_routes = ["/materials", "/suppliers", "/purchases", "/settings", "/reports"]
-        if user_session and user_session.get("role") == "Operator" and self.page.route in admin_only_routes:
+        if role == "Operator" and self.page.route in admin_only_routes:
             # Unauthorized access attempt
             self.page.go("/")
             return

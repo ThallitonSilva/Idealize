@@ -94,8 +94,12 @@ class CustomersView(BaseView):
         customers = c.fetchall()
         conn.close()
 
+        exports_dir = os.path.join(os.getcwd(), "exports")
+        if not os.path.exists(exports_dir):
+            os.makedirs(exports_dir)
+
         filename = f"customers_export_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
-        filepath = os.path.join(os.getcwd(), filename)
+        filepath = os.path.join(exports_dir, filename)
 
         with open(filepath, 'w', newline='') as f:
             writer = csv.writer(f)
@@ -104,6 +108,7 @@ class CustomersView(BaseView):
                 writer.writerow([row['id'], row['name'], row['phone'], row['email'], row['address']])
 
         self.page.overlay.append(ft.SnackBar(ft.Text(f"Exported to {filename}"), bgcolor=ft.colors.GREEN_700, open=True))
+        self.page.launch_url(f"/{filename}")
         self.page.update()
 
     def build_content(self):

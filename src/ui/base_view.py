@@ -6,9 +6,22 @@ class BaseView:
         self.route = route
         self.title = title
 
-        # Determine current user role
-        user = self.page.session.get("user")
-        self.role = user['role'] if user else None
+        from database import get_db_connection
+
+        # Determine current user role securely from backend
+        user_id = self.page.session.get("user_id")
+        self.role = None
+        self.username = None
+
+        if user_id:
+            conn = get_db_connection()
+            c = conn.cursor()
+            c.execute("SELECT role, username FROM users WHERE id = ?", (user_id,))
+            user_row = c.fetchone()
+            conn.close()
+            if user_row:
+                self.role = user_row['role']
+                self.username = user_row['username']
 
         self.appbar = ft.AppBar(
             title=ft.Text(self.title, color=ft.colors.WHITE),

@@ -126,8 +126,12 @@ class ReportsView(BaseView):
             supplier_chart_image = ft.Image(src_base64=img_str2, width=800, height=400)
 
         def export_csv(e):
+            exports_dir = os.path.join(os.getcwd(), "exports")
+            if not os.path.exists(exports_dir):
+                os.makedirs(exports_dir)
+
             filename = f"profitability_report_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
-            filepath = os.path.join(os.getcwd(), filename)
+            filepath = os.path.join(exports_dir, filename)
 
             with open(filepath, 'w', newline='') as f:
                 writer = csv.writer(f)
@@ -136,6 +140,7 @@ class ReportsView(BaseView):
                     writer.writerow([row['name'], f"{row['revenue']:.2f}", f"{row['costs']:.2f}", f"{row['profit']:.2f}"])
 
             self.page.overlay.append(ft.SnackBar(ft.Text(f"Exported to {filename}"), bgcolor=ft.colors.GREEN_700, open=True))
+            self.page.launch_url(f"/{filename}")
             self.page.update()
 
         return ft.Container(

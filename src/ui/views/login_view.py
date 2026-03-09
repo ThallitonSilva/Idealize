@@ -50,7 +50,7 @@ class LoginView(ft.View):
             computed_hash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000).hex()
 
             if computed_hash == user["password_hash"]:
-                self.page.session.set("user", {"id": user["id"], "username": user["username"], "role": user["role"]})
+                self.page.session.set("user_id", user["id"])
                 self.page.go("/")
                 return
 

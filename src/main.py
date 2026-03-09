@@ -16,12 +16,15 @@ def main(page: ft.Page):
     page.on_view_pop = router.view_pop
 
     # Check if a user is logged in
-    user = page.session.get("user")
+    user_id = page.session.get("user_id")
 
-    if user:
+    if user_id:
         page.go("/")
     else:
         page.go("/login")
 
 if __name__ == "__main__":
-    ft.app(target=main)
+    import os
+    if not os.path.exists("exports"):
+        os.makedirs("exports")
+    ft.run(main, assets_dir="exports")

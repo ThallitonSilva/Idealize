@@ -107,13 +107,60 @@ class SettingsView(BaseView):
         self.page.overlay.append(ft.SnackBar(ft.Text("Settings saved successfully!"), bgcolor=ft.colors.GREEN_700, open=True))
         self.page.update()
 
+    def show_add_profile_dialog(self, e):
+        name_input = ft.TextField(label="Profile Name")
+        markup_input = ft.TextField(label="Markup Multiplier", value="2.0", keyboard_type=ft.KeyboardType.NUMBER)
+        margin_input = ft.TextField(label="Profit Margin %", value="100", keyboard_type=ft.KeyboardType.NUMBER)
+
+        def save_profile(e):
+            if not name_input.value:
+                self.page.overlay.append(ft.SnackBar(ft.Text("Profile name is required"), bgcolor=ft.colors.RED, open=True))
+                self.page.update()
+                return
+
+            conn = get_db_connection()
+            c = conn.cursor()
+            c.execute("INSERT INTO pricing_profiles (name, markup_multiplier, profit_margin_percent) VALUES (?, ?, ?)",
+                      (name_input.value, float(markup_input.value or 1), float(margin_input.value or 0)))
+            conn.commit()
+            conn.close()
+
+            self.page.dialog.open = False
+            self.load_settings()
+            self.update_content()
+            self.page.go("/settings") # Refresh the view
+
+        dlg = ft.AlertDialog(
+            title=ft.Text("Add Pricing Profile"),
+            content=ft.Column([name_input, markup_input, margin_input], tight=True),
+            actions=[
+                ft.TextButton("Cancel", on_click=lambda e: setattr(self.page.dialog, 'open', False) or self.page.update()),
+                ft.ElevatedButton("Save", on_click=save_profile)
+            ]
+        )
+        self.page.dialog = dlg
+        dlg.open = True
+        self.page.update()
+
+    def delete_profile(self, profile_id):
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute("DELETE FROM pricing_profiles WHERE id = ?", (profile_id,))
+        conn.commit()
+        conn.close()
+
+        self.load_settings()
+        self.update_content()
+        self.page.go("/settings") # Refresh the view
+
     def update_content(self):
         profiles_list = ft.ListView(height=150, spacing=5)
         for p in self.profiles:
             profiles_list.controls.append(
                 ft.ListTile(
                     title=ft.Text(p['name']),
-                    subtitle=ft.Text(f"Markup: {p['markup_multiplier']}x | Margin: {p['profit_margin_percent']}%")
+                    subtitle=ft.Text(f"Markup: {p['markup_multiplier']}x | Margin: {p['profit_margin_percent']}%"),
+                    trailing=ft.IconButton(ft.icons.DELETE, icon_color=ft.colors.RED_400, on_click=lambda e, pid=p['id']: self.delete_profile(pid))
                 )
             )
 
@@ -132,7 +179,10 @@ class SettingsView(BaseView):
                     ft.ElevatedButton("Recalculate", on_click=self.calculate_machine_cost),
                     self.machine_minute_cost_display,
 
-                    ft.Text("Pricing Profiles", size=20, weight=ft.FontWeight.BOLD),
+                    ft.Row([
+                        ft.Text("Pricing Profiles", size=20, weight=ft.FontWeight.BOLD),
+                        ft.IconButton(ft.icons.ADD_CIRCLE, icon_color=ft.colors.BLUE_700, on_click=self.show_add_profile_dialog)
+                    ]),
                     ft.Divider(),
                     profiles_list,
 

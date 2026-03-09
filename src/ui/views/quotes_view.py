@@ -155,8 +155,12 @@ class QuotesView(BaseView):
         items = c.fetchall()
         conn.close()
 
+        exports_dir = os.path.join(os.getcwd(), "exports")
+        if not os.path.exists(exports_dir):
+            os.makedirs(exports_dir)
+
         filename = f"quote_{quote_id}.pdf"
-        filepath = os.path.join(os.getcwd(), filename)
+        filepath = os.path.join(exports_dir, filename)
 
         pdf = canvas.Canvas(filepath, pagesize=A4)
         pdf.setFont("Helvetica-Bold", 20)
@@ -191,6 +195,7 @@ class QuotesView(BaseView):
         pdf.save()
 
         self.page.overlay.append(ft.SnackBar(ft.Text(f"PDF Generated: {filename}"), bgcolor=ft.colors.GREEN_700, open=True))
+        self.page.launch_url(f"/{filename}")
         self.page.update()
 
     def save_item_to_catalog(self, item_dict):
