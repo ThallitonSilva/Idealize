@@ -182,7 +182,7 @@ class CatalogView(BaseView):
             conn.commit()
             conn.close()
 
-            self.page.dialog.open = False
+            self.page.pop_dialog()
             self.load_catalog()
             self.page.update()
 
@@ -194,12 +194,12 @@ class CatalogView(BaseView):
                 mat_dd, ft.Row([w_input, h_input]), ft.Row([mach_input, man_input]), extra_input
             ], tight=True),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: setattr(self.page.dialog, 'open', False) or self.page.update()),
+                ft.TextButton("Cancel", on_click=lambda e: self.page.pop_dialog() or self.page.update()),
                 ft.ElevatedButton("Save Product", on_click=save_product, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
-        self.page.dialog = dlg
-        dlg.open = True
+        self.page.show_dialog(dlg)
+
         self.page.update()
 
     def show_add_variation_dialog(self, product_id, product_name):
@@ -234,7 +234,7 @@ class CatalogView(BaseView):
             conn.commit()
             conn.close()
 
-            self.page.dialog.open = False
+            self.page.pop_dialog()
             self.load_catalog()
             self.page.update()
 
@@ -246,12 +246,12 @@ class CatalogView(BaseView):
                 mat_dd, ft.Row([w_input, h_input]), ft.Row([mach_input, man_input]), extra_input
             ], tight=True),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: setattr(self.page.dialog, 'open', False) or self.page.update()),
+                ft.TextButton("Cancel", on_click=lambda e: self.page.pop_dialog() or self.page.update()),
                 ft.ElevatedButton("Save Variation", on_click=save_variation, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
-        self.page.dialog = dlg
-        dlg.open = True
+        self.page.show_dialog(dlg)
+
         self.page.update()
 
     def show_add_kit_dialog(self, e):
@@ -303,7 +303,7 @@ class CatalogView(BaseView):
             conn.commit()
             conn.close()
 
-            self.page.dialog.open = False
+            self.page.pop_dialog()
             self.load_catalog()
             self.page.update()
 
@@ -318,12 +318,12 @@ class CatalogView(BaseView):
                 components_listview
             ], tight=True),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: setattr(self.page.dialog, 'open', False) or self.page.update()),
+                ft.TextButton("Cancel", on_click=lambda e: self.page.pop_dialog() or self.page.update()),
                 ft.ElevatedButton("Save Kit", on_click=save_kit, bgcolor=ft.Colors.AMBER_600, color=ft.Colors.BLACK)
             ]
         )
-        self.page.dialog = dlg
-        dlg.open = True
+        self.page.show_dialog(dlg)
+
         self.page.update()
 
     def export_csv(self, e):

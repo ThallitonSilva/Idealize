@@ -41,7 +41,7 @@ class MaterialsView(BaseView):
 
     def show_add_dialog(self, e):
         def close_dlg(e):
-            self.page.dialog.open = False
+            self.page.pop_dialog()
             self.page.update()
 
         def save_material(e):
@@ -104,8 +104,8 @@ class MaterialsView(BaseView):
             ]
         )
 
-        self.page.dialog = dialog
-        dialog.open = True
+        self.page.show_dialog(dialog)
+
         self.page.update()
 
     def build_content(self):

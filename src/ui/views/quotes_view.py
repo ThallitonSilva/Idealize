@@ -341,7 +341,7 @@ class QuotesView(BaseView):
                 )
                 recalc_totals()
 
-                self.page.dialog.open = False
+                self.page.pop_dialog()
                 self.page.update()
 
             dlg = ft.AlertDialog(
@@ -349,8 +349,8 @@ class QuotesView(BaseView):
                 content=ft.Column([mat_dd, ft.Row([w_input, h_input]), ft.Row([mach_input, man_input]), ft.Row([extra_input, qty_input]), live_cost], tight=True),
                 actions=[ft.ElevatedButton("Add", on_click=save_item)]
             )
-            self.page.dialog = dlg
-            dlg.open = True
+            self.page.show_dialog(dlg)
+
             self.page.update()
 
         def save_quote(e):
@@ -382,12 +382,12 @@ class QuotesView(BaseView):
             conn.commit()
             conn.close()
 
-            self.page.dialog.open = False
+            self.page.pop_dialog()
             self.load_quotes()
             self.page.update()
 
         def cancel_quote(e):
-            self.page.dialog.open = False
+            self.page.pop_dialog()
             self.page.update()
 
         main_dlg = ft.AlertDialog(
@@ -408,8 +408,8 @@ class QuotesView(BaseView):
                 ft.ElevatedButton("Save Quote", on_click=save_quote, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
-        self.page.dialog = main_dlg
-        main_dlg.open = True
+        self.page.show_dialog(main_dlg)
+
         self.page.update()
 
     def build_content(self):

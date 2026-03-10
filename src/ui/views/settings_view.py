@@ -125,7 +125,7 @@ class SettingsView(BaseView):
             conn.commit()
             conn.close()
 
-            self.page.dialog.open = False
+            self.page.pop_dialog()
             self.load_settings()
             self.update_content()
             self.page.go("/settings") # Refresh the view
@@ -134,12 +134,12 @@ class SettingsView(BaseView):
             title=ft.Text("Add Pricing Profile"),
             content=ft.Column([name_input, markup_input, margin_input], tight=True),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: setattr(self.page.dialog, 'open', False) or self.page.update()),
+                ft.TextButton("Cancel", on_click=lambda e: self.page.pop_dialog() or self.page.update()),
                 ft.ElevatedButton("Save", on_click=save_profile)
             ]
         )
-        self.page.dialog = dlg
-        dlg.open = True
+        self.page.show_dialog(dlg)
+
         self.page.update()
 
     def delete_profile(self, profile_id):
