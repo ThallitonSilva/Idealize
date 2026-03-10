@@ -34,7 +34,7 @@ class AppRouter:
         from database import get_db_connection
 
         # Check authentication
-        user_id = self.page.session.get("user_id")
+        user_id = getattr(self.page, "user_id", None)
 
         if not user_id and self.page.route != "/login":
             self.page.go("/login")

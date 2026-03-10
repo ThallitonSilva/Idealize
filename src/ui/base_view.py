@@ -9,7 +9,7 @@ class BaseView:
         from database import get_db_connection
 
         # Determine current user role securely from backend
-        user_id = self.page.session.get("user_id")
+        user_id = getattr(self.page, "user_id", None)
         self.role = None
         self.username = None
 
@@ -94,7 +94,7 @@ class BaseView:
             self.page.go(self.routes_map[idx])
 
     def logout(self, e):
-        self.page.session.clear()
+        self.page.user_id = None
         self.page.go("/login")
 
     def get_view(self):

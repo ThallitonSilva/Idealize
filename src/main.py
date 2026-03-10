@@ -16,7 +16,7 @@ def main(page: ft.Page):
     page.on_view_pop = router.view_pop
 
     # Check if a user is logged in
-    user_id = page.session.get("user_id")
+    user_id = getattr(page, "user_id", None)
 
     if user_id:
         page.go("/")
