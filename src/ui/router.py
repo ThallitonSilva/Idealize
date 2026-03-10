@@ -56,12 +56,26 @@ class AppRouter:
             self.page.go("/")
             return
 
-        # Get the view class
-        view_class = self.routes.get(self.page.route, DashboardView)
+        try:
+            # Get the view class
+            view_class = self.routes.get(self.page.route, DashboardView)
 
-        # Instantiate and append view
-        view_instance = view_class(self.page)
-        self.page.views.append(view_instance.get_view())
+            # Instantiate and append view
+            view_instance = view_class(self.page)
+            self.page.views.append(view_instance.get_view())
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            self.page.views.append(
+                ft.View(
+                    route="/error",
+                    appbar=ft.AppBar(title=ft.Text("Error"), bgcolor=ft.Colors.RED_700),
+                    controls=[
+                        ft.Text(f"An error occurred while routing to {self.page.route}:", size=18, color=ft.Colors.RED),
+                        ft.Text(str(e))
+                    ]
+                )
+            )
 
         self.page.update()
 

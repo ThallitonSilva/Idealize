@@ -2,6 +2,8 @@ import flet as ft
 from ui.base_view import BaseView
 from database import get_db_connection
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from io import BytesIO
 import base64

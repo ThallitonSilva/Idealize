@@ -99,9 +99,9 @@ class BaseView:
 
     def get_view(self):
         return ft.View(
-            self.route,
-            [
-                self.appbar,
+            route=self.route,
+            appbar=self.appbar,
+            controls=[
                 ft.Row(
                     [
                         self.nav_rail,
