@@ -6,7 +6,7 @@ import hashlib
 class LoginView(ft.View):
     def __init__(self, page: ft.Page):
         super().__init__("/login", [])
-        self.page = page
+        self._app_page = page
 
         self.username_input = ft.TextField(label="Username", autofocus=True)
         self.password_input = ft.TextField(label="Password", password=True, can_reveal_password=True)
@@ -50,8 +50,8 @@ class LoginView(ft.View):
             computed_hash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000).hex()
 
             if computed_hash == user["password_hash"]:
-                self.page.user_id = user["id"]
-                self.page.go("/")
+                self._app_page.user_id = user["id"]
+                self._app_page.go("/")
                 return
 
         self.show_error("Invalid credentials.")
@@ -59,7 +59,7 @@ class LoginView(ft.View):
     def show_error(self, message):
         self.error_text.value = message
         self.error_text.visible = True
-        self.page.update()
+        self._app_page.update()
 
     def get_view(self):
         return self
