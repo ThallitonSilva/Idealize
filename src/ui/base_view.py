@@ -24,29 +24,29 @@ class BaseView:
                 self.username = user_row['username']
 
         self.appbar = ft.AppBar(
-            title=ft.Text(self.title, color=ft.colors.WHITE),
-            bgcolor=ft.colors.BLUE_700,
+            title=ft.Text(self.title, color=ft.Colors.WHITE),
+            bgcolor=ft.Colors.BLUE_700,
             actions=[
-                ft.IconButton(ft.icons.LOGOUT, on_click=self.logout, tooltip="Logout", icon_color=ft.colors.WHITE)
+                ft.IconButton(ft.Icons.LOGOUT, on_click=self.logout, tooltip="Logout", icon_color=ft.Colors.WHITE)
             ]
         )
 
         # Build Navigation Rail based on Role
         destinations = [
             ft.NavigationRailDestination(
-                icon=ft.icons.DASHBOARD_OUTLINED, selected_icon=ft.icons.DASHBOARD, label="Dashboard"
+                icon=ft.Icons.DASHBOARD_OUTLINED, selected_icon=ft.Icons.DASHBOARD, label="Dashboard"
             ),
             ft.NavigationRailDestination(
-                icon=ft.icons.MONEY_OUTLINED, selected_icon=ft.icons.MONEY, label="Quotes"
+                icon=ft.Icons.MONEY_OUTLINED, selected_icon=ft.Icons.MONEY, label="Quotes"
             ),
             ft.NavigationRailDestination(
-                icon=ft.icons.VIEW_KANBAN_OUTLINED, selected_icon=ft.icons.VIEW_KANBAN, label="Kanban"
+                icon=ft.Icons.VIEW_KANBAN_OUTLINED, selected_icon=ft.Icons.VIEW_KANBAN, label="Kanban"
             ),
             ft.NavigationRailDestination(
-                icon=ft.icons.CATEGORY_OUTLINED, selected_icon=ft.icons.CATEGORY, label="Catalog"
+                icon=ft.Icons.CATEGORY_OUTLINED, selected_icon=ft.Icons.CATEGORY, label="Catalog"
             ),
             ft.NavigationRailDestination(
-                icon=ft.icons.PEOPLE_OUTLINED, selected_icon=ft.icons.PEOPLE, label="Customers"
+                icon=ft.Icons.PEOPLE_OUTLINED, selected_icon=ft.Icons.PEOPLE, label="Customers"
             ),
         ]
 
@@ -57,19 +57,19 @@ class BaseView:
         if self.role == 'Admin':
             destinations.extend([
                 ft.NavigationRailDestination(
-                    icon=ft.icons.LAYERS_OUTLINED, selected_icon=ft.icons.LAYERS, label="Materials"
+                    icon=ft.Icons.LAYERS_OUTLINED, selected_icon=ft.Icons.LAYERS, label="Materials"
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.icons.LOCAL_SHIPPING_OUTLINED, selected_icon=ft.icons.LOCAL_SHIPPING, label="Suppliers"
+                    icon=ft.Icons.LOCAL_SHIPPING_OUTLINED, selected_icon=ft.Icons.LOCAL_SHIPPING, label="Suppliers"
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.icons.SHOPPING_CART_OUTLINED, selected_icon=ft.icons.SHOPPING_CART, label="Purchases"
+                    icon=ft.Icons.SHOPPING_CART_OUTLINED, selected_icon=ft.Icons.SHOPPING_CART, label="Purchases"
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.icons.ANALYTICS_OUTLINED, selected_icon=ft.icons.ANALYTICS, label="Reports"
+                    icon=ft.Icons.ANALYTICS_OUTLINED, selected_icon=ft.Icons.ANALYTICS, label="Reports"
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.icons.SETTINGS_OUTLINED, selected_icon=ft.icons.SETTINGS, label="Settings"
+                    icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icons.SETTINGS, label="Settings"
                 ),
             ])
             self.routes_map.extend([

@@ -69,7 +69,7 @@ class ReportsView(BaseView):
                         ft.DataCell(ft.Text(row['name'])),
                         ft.DataCell(ft.Text(f"{row['revenue']:.2f}")),
                         ft.DataCell(ft.Text(f"{row['costs']:.2f}")),
-                        ft.DataCell(ft.Text(f"{row['profit']:.2f}", color=ft.colors.GREEN_700, weight=ft.FontWeight.BOLD)),
+                        ft.DataCell(ft.Text(f"{row['profit']:.2f}", color=ft.Colors.GREEN_700, weight=ft.FontWeight.BOLD)),
                     ]
                 )
             )
@@ -139,7 +139,7 @@ class ReportsView(BaseView):
                 for row in profit_by_cust:
                     writer.writerow([row['name'], f"{row['revenue']:.2f}", f"{row['costs']:.2f}", f"{row['profit']:.2f}"])
 
-            self.page.overlay.append(ft.SnackBar(ft.Text(f"Exported to {filename}"), bgcolor=ft.colors.GREEN_700, open=True))
+            self.page.overlay.append(ft.SnackBar(ft.Text(f"Exported to {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
             self.page.launch_url(f"/{filename}")
             self.page.update()
 
@@ -147,7 +147,7 @@ class ReportsView(BaseView):
             content=ft.ListView([
                 ft.Row([
                     ft.Text("Business Intelligence & Reports", size=24, weight=ft.FontWeight.BOLD),
-                    ft.ElevatedButton("Export Profitability to CSV", icon=ft.icons.DOWNLOAD, on_click=export_csv, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                    ft.ElevatedButton("Export Profitability to CSV", icon=ft.Icons.DOWNLOAD, on_click=export_csv, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
 

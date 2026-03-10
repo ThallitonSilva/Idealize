@@ -70,7 +70,7 @@ class CustomersView(BaseView):
         phone_input = ft.TextField(label="Phone")
         email_input = ft.TextField(label="Email")
         address_input = ft.TextField(label="Address")
-        error_text = ft.Text(color=ft.colors.RED, visible=False)
+        error_text = ft.Text(color=ft.Colors.RED, visible=False)
 
         dialog = ft.AlertDialog(
             title=ft.Text("Add Customer"),
@@ -79,7 +79,7 @@ class CustomersView(BaseView):
             ], tight=True),
             actions=[
                 ft.TextButton("Cancel", on_click=close_dlg),
-                ft.ElevatedButton("Save", on_click=save_customer, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                ft.ElevatedButton("Save", on_click=save_customer, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
 
@@ -107,7 +107,7 @@ class CustomersView(BaseView):
             for row in customers:
                 writer.writerow([row['id'], row['name'], row['phone'], row['email'], row['address']])
 
-        self.page.overlay.append(ft.SnackBar(ft.Text(f"Exported to {filename}"), bgcolor=ft.colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text(f"Exported to {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.page.launch_url(f"/{filename}")
         self.page.update()
 
@@ -117,8 +117,8 @@ class CustomersView(BaseView):
                 ft.Row([
                     ft.Text("Customers (Mini-CRM)", size=24, weight=ft.FontWeight.BOLD),
                     ft.Row([
-                        ft.ElevatedButton("Export CSV", icon=ft.icons.DOWNLOAD, on_click=self.export_csv, bgcolor=ft.colors.GREEN_700, color=ft.colors.WHITE),
-                        ft.ElevatedButton("Add Customer", icon=ft.icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                        ft.ElevatedButton("Export CSV", icon=ft.Icons.DOWNLOAD, on_click=self.export_csv, bgcolor=ft.Colors.GREEN_700, color=ft.Colors.WHITE),
+                        ft.ElevatedButton("Add Customer", icon=ft.Icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                     ])
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),

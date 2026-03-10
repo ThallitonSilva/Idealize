@@ -33,7 +33,7 @@ class MaterialsView(BaseView):
                                 ft.Text(material['name'], size=16, weight=ft.FontWeight.BOLD),
                                 ft.Text(f"Type/Color: {material['type_thickness_color']} | Unit: {material['unit']}"),
                                 ft.Text(f"Dimensions: {dims} | Area: {area_m2}"),
-                                ft.Text(f"Cost: {cost_m2}", color=ft.colors.GREEN_700, weight=ft.FontWeight.W_600)
+                                ft.Text(f"Cost: {cost_m2}", color=ft.Colors.GREEN_700, weight=ft.FontWeight.W_600)
                             ])
                         )
                     )
@@ -91,7 +91,7 @@ class MaterialsView(BaseView):
         )
         width_input = ft.TextField(label="Width (cm)", keyboard_type=ft.KeyboardType.NUMBER)
         height_input = ft.TextField(label="Height (cm)", keyboard_type=ft.KeyboardType.NUMBER)
-        error_text = ft.Text(color=ft.colors.RED, visible=False)
+        error_text = ft.Text(color=ft.Colors.RED, visible=False)
 
         dialog = ft.AlertDialog(
             title=ft.Text("Add Material"),
@@ -100,7 +100,7 @@ class MaterialsView(BaseView):
             ], tight=True),
             actions=[
                 ft.TextButton("Cancel", on_click=close_dlg),
-                ft.ElevatedButton("Save", on_click=save_material, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                ft.ElevatedButton("Save", on_click=save_material, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
 
@@ -113,7 +113,7 @@ class MaterialsView(BaseView):
             content=ft.Column([
                 ft.Row([
                     ft.Text("Materials Catalog", size=24, weight=ft.FontWeight.BOLD),
-                    ft.ElevatedButton("Add Material", icon=ft.icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                    ft.ElevatedButton("Add Material", icon=ft.Icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
                 self.materials_list

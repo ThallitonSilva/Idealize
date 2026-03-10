@@ -41,15 +41,15 @@ class KanbanView(BaseView):
                     width=250,
                     padding=15,
                     border_radius=8,
-                    bgcolor=ft.colors.WHITE,
-                    border=ft.border.all(1, ft.colors.GREY_300),
-                    shadow=ft.BoxShadow(spread_radius=1, blur_radius=3, color=ft.colors.GREY_400),
+                    bgcolor=ft.Colors.WHITE,
+                    border=ft.Border.all(1, ft.Colors.GREY_300),
+                    shadow=ft.BoxShadow(spread_radius=1, blur_radius=3, color=ft.Colors.GREY_400),
                     content=ft.Column([
-                        ft.Text(f"Order #{o['id']}", weight=ft.FontWeight.BOLD, color=ft.colors.BLUE_700),
+                        ft.Text(f"Order #{o['id']}", weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_700),
                         ft.Text(f"Client: {o['customer_name']}", weight=ft.FontWeight.W_600),
-                        ft.Text(items_text, size=12, color=ft.colors.GREY_700),
-                        ft.Divider(height=1, color=ft.colors.GREY_200),
-                        ft.Text(f"Value: R$ {o['total_price']:.2f}", size=12, weight=ft.FontWeight.BOLD, color=ft.colors.GREEN_700)
+                        ft.Text(items_text, size=12, color=ft.Colors.GREY_700),
+                        ft.Divider(height=1, color=ft.Colors.GREY_200),
+                        ft.Text(f"Value: R$ {o['total_price']:.2f}", size=12, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700)
                     ], spacing=5)
                 )
 
@@ -58,8 +58,8 @@ class KanbanView(BaseView):
                     data=str(o['id']), # Data must be string for easier handling
                     content=card_content,
                     content_feedback=ft.Container(
-                        width=250, padding=15, border_radius=8, bgcolor=ft.colors.BLUE_100,
-                        border=ft.border.all(2, ft.colors.BLUE_700),
+                        width=250, padding=15, border_radius=8, bgcolor=ft.Colors.BLUE_100,
+                        border=ft.Border.all(2, ft.Colors.BLUE_700),
                         content=ft.Text(f"Moving Order #{o['id']}", weight=ft.FontWeight.BOLD)
                     )
                 )
@@ -94,11 +94,11 @@ class KanbanView(BaseView):
         )
 
         colors_map = {
-            'To Do': ft.colors.GREY_200,
-            'In Production': ft.colors.AMBER_100,
-            'In Finishing': ft.colors.PURPLE_100,
-            'Ready for Delivery': ft.colors.BLUE_100,
-            'Completed': ft.colors.GREEN_100
+            'To Do': ft.Colors.GREY_200,
+            'In Production': ft.Colors.AMBER_100,
+            'In Finishing': ft.Colors.PURPLE_100,
+            'Ready for Delivery': ft.Colors.BLUE_100,
+            'Completed': ft.Colors.GREEN_100
         }
 
         for status in self.statuses:
@@ -114,7 +114,7 @@ class KanbanView(BaseView):
                     content=ft.Column([
                         ft.Container(
                             padding=10,
-                            bgcolor=ft.colors.WHITE,
+                            bgcolor=ft.Colors.WHITE,
                             border_radius=8,
                             content=ft.Text(status, weight=ft.FontWeight.BOLD, size=16, text_align="center")
                         ),
@@ -129,7 +129,7 @@ class KanbanView(BaseView):
             content=ft.Column([
                 ft.Row([
                     ft.Text("Production Kanban", size=24, weight=ft.FontWeight.BOLD),
-                    ft.Text("Drag and drop orders to update their status.", italic=True, color=ft.colors.GREY_700)
+                    ft.Text("Drag and drop orders to update their status.", italic=True, color=ft.Colors.GREY_700)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
                 ft.Container(content=kanban_board, expand=True)

@@ -122,7 +122,7 @@ class PurchasesView(BaseView):
         qty_input = ft.TextField(label="Quantity (Sheets/Plates/Units)", value="1", keyboard_type=ft.KeyboardType.NUMBER)
         cost_input = ft.TextField(label="Total Cost Price", keyboard_type=ft.KeyboardType.NUMBER)
         lot_input = ft.TextField(label="Lot Code (Optional)")
-        error_text = ft.Text(color=ft.colors.RED, visible=False)
+        error_text = ft.Text(color=ft.Colors.RED, visible=False)
 
         dialog = ft.AlertDialog(
             title=ft.Text("Register Purchase"),
@@ -131,7 +131,7 @@ class PurchasesView(BaseView):
             ], tight=True),
             actions=[
                 ft.TextButton("Cancel", on_click=close_dlg),
-                ft.ElevatedButton("Save", on_click=save_purchase, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                ft.ElevatedButton("Save", on_click=save_purchase, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
 
@@ -144,7 +144,7 @@ class PurchasesView(BaseView):
             content=ft.Column([
                 ft.Row([
                     ft.Text("Purchase History", size=24, weight=ft.FontWeight.BOLD),
-                    ft.ElevatedButton("Register Purchase", icon=ft.icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                    ft.ElevatedButton("Register Purchase", icon=ft.Icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
                 self.purchases_list

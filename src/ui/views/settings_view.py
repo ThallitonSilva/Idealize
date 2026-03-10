@@ -42,7 +42,7 @@ class SettingsView(BaseView):
 
         self.machine_minute_cost_display = ft.Text(
             f"Calculated Machine Minute Cost: R$ {settings_dict.get('machine_minute_cost_cached', '0.00')}",
-            weight=ft.FontWeight.BOLD, color=ft.colors.BLUE_700
+            weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_700
         )
 
         # Taxes
@@ -104,7 +104,7 @@ class SettingsView(BaseView):
         conn.close()
 
         # Provide feedback
-        self.page.overlay.append(ft.SnackBar(ft.Text("Settings saved successfully!"), bgcolor=ft.colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text("Settings saved successfully!"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.page.update()
 
     def show_add_profile_dialog(self, e):
@@ -114,7 +114,7 @@ class SettingsView(BaseView):
 
         def save_profile(e):
             if not name_input.value:
-                self.page.overlay.append(ft.SnackBar(ft.Text("Profile name is required"), bgcolor=ft.colors.RED, open=True))
+                self.page.overlay.append(ft.SnackBar(ft.Text("Profile name is required"), bgcolor=ft.Colors.RED, open=True))
                 self.page.update()
                 return
 
@@ -160,7 +160,7 @@ class SettingsView(BaseView):
                 ft.ListTile(
                     title=ft.Text(p['name']),
                     subtitle=ft.Text(f"Markup: {p['markup_multiplier']}x | Margin: {p['profit_margin_percent']}%"),
-                    trailing=ft.IconButton(ft.icons.DELETE, icon_color=ft.colors.RED_400, on_click=lambda e, pid=p['id']: self.delete_profile(pid))
+                    trailing=ft.IconButton(ft.Icons.DELETE, icon_color=ft.Colors.RED_400, on_click=lambda e, pid=p['id']: self.delete_profile(pid))
                 )
             )
 
@@ -181,13 +181,13 @@ class SettingsView(BaseView):
 
                     ft.Row([
                         ft.Text("Pricing Profiles", size=20, weight=ft.FontWeight.BOLD),
-                        ft.IconButton(ft.icons.ADD_CIRCLE, icon_color=ft.colors.BLUE_700, on_click=self.show_add_profile_dialog)
+                        ft.IconButton(ft.Icons.ADD_CIRCLE, icon_color=ft.Colors.BLUE_700, on_click=self.show_add_profile_dialog)
                     ]),
                     ft.Divider(),
                     profiles_list,
 
                     ft.Container(height=20),
-                    ft.ElevatedButton("Save All Settings", on_click=self.save_settings, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE, width=200)
+                    ft.ElevatedButton("Save All Settings", on_click=self.save_settings, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE, width=200)
                 ],
                 expand=True,
                 spacing=10

@@ -67,7 +67,7 @@ class SuppliersView(BaseView):
         phone_input = ft.TextField(label="Phone")
         email_input = ft.TextField(label="Email")
         address_input = ft.TextField(label="Address")
-        error_text = ft.Text(color=ft.colors.RED, visible=False)
+        error_text = ft.Text(color=ft.Colors.RED, visible=False)
 
         dialog = ft.AlertDialog(
             title=ft.Text("Add Supplier"),
@@ -76,7 +76,7 @@ class SuppliersView(BaseView):
             ], tight=True),
             actions=[
                 ft.TextButton("Cancel", on_click=close_dlg),
-                ft.ElevatedButton("Save", on_click=save_supplier, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                ft.ElevatedButton("Save", on_click=save_supplier, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
 
@@ -89,7 +89,7 @@ class SuppliersView(BaseView):
             content=ft.Column([
                 ft.Row([
                     ft.Text("Suppliers", size=24, weight=ft.FontWeight.BOLD),
-                    ft.ElevatedButton("Add Supplier", icon=ft.icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                    ft.ElevatedButton("Add Supplier", icon=ft.Icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
                 self.suppliers_list

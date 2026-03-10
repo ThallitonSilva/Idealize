@@ -48,10 +48,10 @@ class QuotesView(BaseView):
         else:
             for q in quotes:
 
-                status_color = ft.colors.GREY_700
-                if q['status'] == 'Approved': status_color = ft.colors.GREEN_700
-                elif q['status'] == 'Rejected': status_color = ft.colors.RED_700
-                elif q['status'] == 'Sent': status_color = ft.colors.BLUE_700
+                status_color = ft.Colors.GREY_700
+                if q['status'] == 'Approved': status_color = ft.Colors.GREEN_700
+                elif q['status'] == 'Rejected': status_color = ft.Colors.RED_700
+                elif q['status'] == 'Sent': status_color = ft.Colors.BLUE_700
 
                 self.quotes_list.controls.append(
                     ft.Card(
@@ -60,7 +60,7 @@ class QuotesView(BaseView):
                             content=ft.Column([
                                 ft.Row([
                                     ft.Text(f"Quote #{q['id']} - {q['customer_name']}", size=16, weight=ft.FontWeight.BOLD),
-                                    ft.Container(content=ft.Text(q['status'], color=ft.colors.WHITE, weight=ft.FontWeight.BOLD), bgcolor=status_color, padding=5, border_radius=5)
+                                    ft.Container(content=ft.Text(q['status'], color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD), bgcolor=status_color, padding=5, border_radius=5)
                                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                                 ft.Text(f"Date: {q['created_at']} | Profile: {q['profile_name'] or 'None'}"),
                                 ft.Text(f"Total Cost: R$ {q['total_cost']:.2f} | Final Price: R$ {q['total_price']:.2f}", weight=ft.FontWeight.W_500) if self.role == "Admin" else ft.Text(f"Final Price: R$ {q['total_price']:.2f}", weight=ft.FontWeight.W_500),
@@ -83,7 +83,7 @@ class QuotesView(BaseView):
         conn.commit()
         conn.close()
 
-        self.page.overlay.append(ft.SnackBar(ft.Text(f"Quote marked as {new_status}!"), bgcolor=ft.colors.BLUE_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text(f"Quote marked as {new_status}!"), bgcolor=ft.Colors.BLUE_700, open=True))
         self.load_quotes()
         self.page.update()
 
@@ -119,7 +119,7 @@ class QuotesView(BaseView):
         conn.commit()
         conn.close()
 
-        self.page.overlay.append(ft.SnackBar(ft.Text(f"New draft version created!"), bgcolor=ft.colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text(f"New draft version created!"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.load_quotes()
         self.page.update()
 
@@ -134,7 +134,7 @@ class QuotesView(BaseView):
         conn.commit()
         conn.close()
 
-        self.page.overlay.append(ft.SnackBar(ft.Text("Quote Approved and Order Created!"), bgcolor=ft.colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text("Quote Approved and Order Created!"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.load_quotes()
         self.page.update()
 
@@ -194,7 +194,7 @@ class QuotesView(BaseView):
 
         pdf.save()
 
-        self.page.overlay.append(ft.SnackBar(ft.Text(f"PDF Generated: {filename}"), bgcolor=ft.colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text(f"PDF Generated: {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.page.launch_url(f"/{filename}")
         self.page.update()
 
@@ -213,7 +213,7 @@ class QuotesView(BaseView):
         conn.commit()
         conn.close()
 
-        self.page.overlay.append(ft.SnackBar(ft.Text("Item saved to Catalog as a new Product!"), bgcolor=ft.colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text("Item saved to Catalog as a new Product!"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.page.update()
 
     def show_create_quote_view(self, e):
@@ -246,8 +246,8 @@ class QuotesView(BaseView):
 
         items_listview = ft.ListView(height=200, spacing=5)
 
-        total_cost_text = ft.Text("Total Cost: R$ 0.00", weight=ft.FontWeight.BOLD, color=ft.colors.RED_700, visible=(self.role == "Admin"))
-        total_price_text = ft.Text("Final Price: R$ 0.00", weight=ft.FontWeight.BOLD, color=ft.colors.GREEN_700, size=18)
+        total_cost_text = ft.Text("Total Cost: R$ 0.00", weight=ft.FontWeight.BOLD, color=ft.Colors.RED_700, visible=(self.role == "Admin"))
+        total_price_text = ft.Text("Final Price: R$ 0.00", weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700, size=18)
 
         def recalc_totals():
             self.current_total_cost = sum(item['item_cost'] * item['quantity'] for item in self.new_quote_items)
@@ -336,7 +336,7 @@ class QuotesView(BaseView):
                     ft.ListTile(
                         title=ft.Text(desc),
                         subtitle=ft.Text(f"Qty: {qty} | Cost/ea: R$ {cost:.2f}") if self.role == "Admin" else ft.Text(f"Qty: {qty}"),
-                        trailing=ft.IconButton(ft.icons.SAVE, tooltip="Save as Catalog Product", on_click=lambda e, i=item_dict: self.save_item_to_catalog(i))
+                        trailing=ft.IconButton(ft.Icons.SAVE, tooltip="Save as Catalog Product", on_click=lambda e, i=item_dict: self.save_item_to_catalog(i))
                     )
                 )
                 recalc_totals()
@@ -355,11 +355,11 @@ class QuotesView(BaseView):
 
         def save_quote(e):
             if not customer_dropdown.value:
-                self.page.overlay.append(ft.SnackBar(ft.Text("Select a customer!"), bgcolor=ft.colors.RED_700, open=True))
+                self.page.overlay.append(ft.SnackBar(ft.Text("Select a customer!"), bgcolor=ft.Colors.RED_700, open=True))
                 self.page.update()
                 return
             if not self.new_quote_items:
-                self.page.overlay.append(ft.SnackBar(ft.Text("Add at least one item!"), bgcolor=ft.colors.RED_700, open=True))
+                self.page.overlay.append(ft.SnackBar(ft.Text("Add at least one item!"), bgcolor=ft.Colors.RED_700, open=True))
                 self.page.update()
                 return
 
@@ -397,7 +397,7 @@ class QuotesView(BaseView):
                 content=ft.Column([
                     ft.Row([customer_dropdown, profile_dropdown]),
                     ft.Divider(),
-                    ft.Row([ft.Text("Items", weight=ft.FontWeight.BOLD), ft.ElevatedButton("Add Item", on_click=add_item_dialog, icon=ft.icons.ADD)]),
+                    ft.Row([ft.Text("Items", weight=ft.FontWeight.BOLD), ft.ElevatedButton("Add Item", on_click=add_item_dialog, icon=ft.Icons.ADD)]),
                     items_listview,
                     ft.Divider(),
                     ft.Row([total_cost_text, total_price_text], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
@@ -405,7 +405,7 @@ class QuotesView(BaseView):
             ),
             actions=[
                 ft.TextButton("Cancel", on_click=cancel_quote),
-                ft.ElevatedButton("Save Quote", on_click=save_quote, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                ft.ElevatedButton("Save Quote", on_click=save_quote, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
         self.page.dialog = main_dlg
@@ -417,7 +417,7 @@ class QuotesView(BaseView):
             content=ft.Column([
                 ft.Row([
                     ft.Text("Quotes", size=24, weight=ft.FontWeight.BOLD),
-                    ft.ElevatedButton("Create Quote", icon=ft.icons.ADD, on_click=self.show_create_quote_view, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                    ft.ElevatedButton("Create Quote", icon=ft.Icons.ADD, on_click=self.show_create_quote_view, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
                 self.quotes_list

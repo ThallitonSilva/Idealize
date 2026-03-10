@@ -10,17 +10,17 @@ class LoginView(ft.View):
 
         self.username_input = ft.TextField(label="Username", autofocus=True)
         self.password_input = ft.TextField(label="Password", password=True, can_reveal_password=True)
-        self.error_text = ft.Text(color=ft.colors.RED_400, visible=False)
+        self.error_text = ft.Text(color=ft.Colors.RED_400, visible=False)
 
         self.controls = [
             ft.Container(
                 content=ft.Column(
                     [
-                        ft.Icon(ft.icons.LOCK_PERSON, size=50, color=ft.colors.BLUE_700),
+                        ft.Icon(ft.Icons.LOCK_PERSON, size=50, color=ft.Colors.BLUE_700),
                         ft.Text("Idealize Personalizados", size=24, weight=ft.FontWeight.BOLD),
                         self.username_input,
                         self.password_input,
-                        ft.ElevatedButton("Login", on_click=self.login, width=200, style=ft.ButtonStyle(bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)),
+                        ft.ElevatedButton("Login", on_click=self.login, width=200, style=ft.ButtonStyle(bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)),
                         self.error_text
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,

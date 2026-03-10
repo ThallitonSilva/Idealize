@@ -69,12 +69,12 @@ class CatalogView(BaseView):
                                 ft.Row([
                                     ft.Text(title_text, size=18, weight=ft.FontWeight.BOLD),
                                     ft.Row([
-                                        ft.IconButton(ft.icons.ADD_BOX, tooltip="Add Variation", on_click=lambda e, pid=p['id'], pname=p['name']: self.show_add_variation_dialog(pid, pname)),
-                                        ft.Container(content=ft.Text("Product", size=10, color=ft.colors.WHITE), bgcolor=ft.colors.BLUE_700, padding=3, border_radius=3)
+                                        ft.IconButton(ft.Icons.ADD_BOX, tooltip="Add Variation", on_click=lambda e, pid=p['id'], pname=p['name']: self.show_add_variation_dialog(pid, pname)),
+                                        ft.Container(content=ft.Text("Product", size=10, color=ft.Colors.WHITE), bgcolor=ft.Colors.BLUE_700, padding=3, border_radius=3)
                                     ])
                                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                                 ft.Text(f"Material: {p['mat_name']} | Dims: {p['width_cm']}x{p['height_cm']}cm"),
-                                ft.Text(f"Base Cost: R$ {current_cost:.2f} | Est. Retail Price: R$ {display_price:.2f}", weight=ft.FontWeight.W_500, color=ft.colors.GREEN_700)
+                                ft.Text(f"Base Cost: R$ {current_cost:.2f} | Est. Retail Price: R$ {display_price:.2f}", weight=ft.FontWeight.W_500, color=ft.Colors.GREEN_700)
                             ])
                         )
                     )
@@ -98,10 +98,10 @@ class CatalogView(BaseView):
                             content=ft.Column([
                                 ft.Row([
                                     ft.Text(k['name'], size=18, weight=ft.FontWeight.BOLD),
-                                    ft.Container(content=ft.Text("Kit", size=10, color=ft.colors.BLACK), bgcolor=ft.colors.AMBER_400, padding=3, border_radius=3)
+                                    ft.Container(content=ft.Text("Kit", size=10, color=ft.Colors.BLACK), bgcolor=ft.Colors.AMBER_400, padding=3, border_radius=3)
                                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                                 ft.Text(k['description'] or "A composite product kit."),
-                                ft.Text(f"Total Base Cost: R$ {kit_cost:.2f} | Kit Price: R$ {display_price:.2f}", weight=ft.FontWeight.W_500, color=ft.colors.GREEN_700)
+                                ft.Text(f"Total Base Cost: R$ {kit_cost:.2f} | Kit Price: R$ {display_price:.2f}", weight=ft.FontWeight.W_500, color=ft.Colors.GREEN_700)
                             ])
                         )
                     )
@@ -165,7 +165,7 @@ class CatalogView(BaseView):
 
         def save_product(e):
             if not name_input.value or not mat_dd.value:
-                self.page.overlay.append(ft.SnackBar(ft.Text("Name and Material are required."), bgcolor=ft.colors.RED, open=True))
+                self.page.overlay.append(ft.SnackBar(ft.Text("Name and Material are required."), bgcolor=ft.Colors.RED, open=True))
                 self.page.update()
                 return
 
@@ -195,7 +195,7 @@ class CatalogView(BaseView):
             ], tight=True),
             actions=[
                 ft.TextButton("Cancel", on_click=lambda e: setattr(self.page.dialog, 'open', False) or self.page.update()),
-                ft.ElevatedButton("Save Product", on_click=save_product, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                ft.ElevatedButton("Save Product", on_click=save_product, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
         self.page.dialog = dlg
@@ -219,7 +219,7 @@ class CatalogView(BaseView):
 
         def save_variation(e):
             if not var_name_input.value or not mat_dd.value:
-                self.page.overlay.append(ft.SnackBar(ft.Text("Variation Name and Material are required."), bgcolor=ft.colors.RED, open=True))
+                self.page.overlay.append(ft.SnackBar(ft.Text("Variation Name and Material are required."), bgcolor=ft.Colors.RED, open=True))
                 self.page.update()
                 return
 
@@ -247,7 +247,7 @@ class CatalogView(BaseView):
             ], tight=True),
             actions=[
                 ft.TextButton("Cancel", on_click=lambda e: setattr(self.page.dialog, 'open', False) or self.page.update()),
-                ft.ElevatedButton("Save Variation", on_click=save_variation, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                ft.ElevatedButton("Save Variation", on_click=save_variation, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
         self.page.dialog = dlg
@@ -283,7 +283,7 @@ class CatalogView(BaseView):
 
         def save_kit(e):
             if not kit_name_input.value or not selected_components:
-                self.page.overlay.append(ft.SnackBar(ft.Text("Name and at least 1 component are required."), bgcolor=ft.colors.RED, open=True))
+                self.page.overlay.append(ft.SnackBar(ft.Text("Name and at least 1 component are required."), bgcolor=ft.Colors.RED, open=True))
                 self.page.update()
                 return
 
@@ -314,12 +314,12 @@ class CatalogView(BaseView):
                 ft.Row([discount_type_dd, discount_value_input]),
                 ft.Divider(),
                 ft.Text("Kit Components", weight=ft.FontWeight.BOLD),
-                ft.Row([comp_dd, comp_qty, ft.IconButton(ft.icons.ADD, on_click=add_component_to_kit)]),
+                ft.Row([comp_dd, comp_qty, ft.IconButton(ft.Icons.ADD, on_click=add_component_to_kit)]),
                 components_listview
             ], tight=True),
             actions=[
                 ft.TextButton("Cancel", on_click=lambda e: setattr(self.page.dialog, 'open', False) or self.page.update()),
-                ft.ElevatedButton("Save Kit", on_click=save_kit, bgcolor=ft.colors.AMBER_600, color=ft.colors.BLACK)
+                ft.ElevatedButton("Save Kit", on_click=save_kit, bgcolor=ft.Colors.AMBER_600, color=ft.Colors.BLACK)
             ]
         )
         self.page.dialog = dlg
@@ -371,7 +371,7 @@ class CatalogView(BaseView):
                     price *= (1 - (k['kit_discount_value'] / 100.0))
                 writer.writerow(["Kit", k['name'], k['description'] or '', f"{cost:.2f}", f"{price:.2f}"])
 
-        self.page.overlay.append(ft.SnackBar(ft.Text(f"Exported to {filename}"), bgcolor=ft.colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text(f"Exported to {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.page.launch_url(f"/{filename}")
         self.page.update()
 
@@ -381,9 +381,9 @@ class CatalogView(BaseView):
                 ft.Row([
                     ft.Text("Product Catalog", size=24, weight=ft.FontWeight.BOLD),
                     ft.Row([
-                        ft.ElevatedButton("Export CSV", icon=ft.icons.DOWNLOAD, on_click=self.export_csv, bgcolor=ft.colors.GREEN_700, color=ft.colors.WHITE),
-                        ft.ElevatedButton("Create Kit", icon=ft.icons.LIBRARY_ADD, on_click=self.show_add_kit_dialog, bgcolor=ft.colors.AMBER_400, color=ft.colors.BLACK),
-                        ft.ElevatedButton("Add Product", icon=ft.icons.ADD, on_click=self.show_add_product_dialog, bgcolor=ft.colors.BLUE_700, color=ft.colors.WHITE)
+                        ft.ElevatedButton("Export CSV", icon=ft.Icons.DOWNLOAD, on_click=self.export_csv, bgcolor=ft.Colors.GREEN_700, color=ft.Colors.WHITE),
+                        ft.ElevatedButton("Create Kit", icon=ft.Icons.LIBRARY_ADD, on_click=self.show_add_kit_dialog, bgcolor=ft.Colors.AMBER_400, color=ft.Colors.BLACK),
+                        ft.ElevatedButton("Add Product", icon=ft.Icons.ADD, on_click=self.show_add_product_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                     ])
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Text("Prices automatically adjust when material or operational costs change in Modules 1 and 2.", italic=True, size=12),

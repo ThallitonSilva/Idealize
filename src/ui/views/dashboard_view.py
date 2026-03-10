@@ -71,9 +71,9 @@ class DashboardView(BaseView):
                 ft.Text(f"Welcome back, {self.username}!", size=30, weight=ft.FontWeight.BOLD),
                 ft.Divider(),
                 ft.Row([
-                    self._create_metric_card("Total Revenue", f"R$ {revenue:,.2f}", ft.icons.MONEY, ft.colors.GREEN_700),
-                    self._create_metric_card("Approved Quotes", str(approved_count), ft.icons.CHECK_CIRCLE, ft.colors.BLUE_700),
-                    self._create_metric_card("Open Quotes", str(open_count), ft.icons.PENDING_ACTIONS, ft.colors.ORANGE_700),
+                    self._create_metric_card("Total Revenue", f"R$ {revenue:,.2f}", ft.Icons.MONEY, ft.Colors.GREEN_700),
+                    self._create_metric_card("Approved Quotes", str(approved_count), ft.Icons.CHECK_CIRCLE, ft.Colors.BLUE_700),
+                    self._create_metric_card("Open Quotes", str(open_count), ft.Icons.PENDING_ACTIONS, ft.Colors.ORANGE_700),
                 ], alignment=ft.MainAxisAlignment.START, spacing=20),
                 ft.Container(height=30),
                 ft.Row([
@@ -91,7 +91,7 @@ class DashboardView(BaseView):
                 content=ft.Row([
                     ft.Icon(icon, size=40, color=color),
                     ft.Column([
-                        ft.Text(title, size=14, color=ft.colors.GREY_700),
+                        ft.Text(title, size=14, color=ft.Colors.GREY_700),
                         ft.Text(value, size=24, weight=ft.FontWeight.BOLD, color=color)
                     ])
                 ]),
