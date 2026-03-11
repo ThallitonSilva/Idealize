@@ -114,4 +114,4 @@ class BaseView:
         )
 
     def build_content(self):
-        return ft.Container(content=ft.Text("Empty Content"), expand=True, padding=20)
+        return ft.Container(content=ft.Text("Conteúdo Vazio"), expand=True, padding=20)
