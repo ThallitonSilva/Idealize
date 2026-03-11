@@ -4,9 +4,16 @@ from database import get_db_connection
 
 class KanbanView(BaseView):
     def __init__(self, page: ft.Page):
-        super().__init__(page, "/kanban", "Kanban Board")
+        super().__init__(page, "/kanban", "Quadro Kanban")
 
         self.statuses = ['To Do', 'In Production', 'In Finishing', 'Ready for Delivery', 'Completed']
+        self.status_labels = {
+            'To Do': 'A Fazer',
+            'In Production': 'Em Produção',
+            'In Finishing': 'Em Acabamento',
+            'Ready for Delivery': 'Pronto para Entrega',
+            'Completed': 'Concluído'
+        }
         # Instead of storing columns in a dict and updating them, we will rebuild the board each time
         self.load_orders()
 
@@ -45,11 +52,11 @@ class KanbanView(BaseView):
                     border=ft.Border.all(1, ft.Colors.GREY_300),
                     shadow=ft.BoxShadow(spread_radius=1, blur_radius=3, color=ft.Colors.GREY_400),
                     content=ft.Column([
-                        ft.Text(f"Order #{o['id']}", weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_700),
-                        ft.Text(f"Client: {o['customer_name']}", weight=ft.FontWeight.W_600),
+                        ft.Text(f"Pedido #{o['id']}", weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_700),
+                        ft.Text(f"Cliente: {o['customer_name']}", weight=ft.FontWeight.W_600),
                         ft.Text(items_text, size=12, color=ft.Colors.GREY_700),
                         ft.Divider(height=1, color=ft.Colors.GREY_200),
-                        ft.Text(f"Value: R$ {o['total_price']:.2f}", size=12, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700)
+                        ft.Text(f"Valor: R$ {o['total_price']:.2f}", size=12, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700)
                     ], spacing=5)
                 )
 
@@ -60,7 +67,7 @@ class KanbanView(BaseView):
                     content_feedback=ft.Container(
                         width=250, padding=15, border_radius=8, bgcolor=ft.Colors.BLUE_100,
                         border=ft.Border.all(2, ft.Colors.BLUE_700),
-                        content=ft.Text(f"Moving Order #{o['id']}", weight=ft.FontWeight.BOLD)
+                        content=ft.Text(f"Movendo Pedido #{o['id']}", weight=ft.FontWeight.BOLD)
                     )
                 )
 
@@ -116,7 +123,7 @@ class KanbanView(BaseView):
                             padding=10,
                             bgcolor=ft.Colors.WHITE,
                             border_radius=8,
-                            content=ft.Text(status, weight=ft.FontWeight.BOLD, size=16, text_align="center")
+                            content=ft.Text(self.status_labels[status], weight=ft.FontWeight.BOLD, size=16, text_align="center")
                         ),
                         ft.Column(self.board_columns[status], spacing=10, scroll=ft.ScrollMode.AUTO)
                     ], expand=True, spacing=15),
@@ -128,8 +135,8 @@ class KanbanView(BaseView):
         return ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Text("Production Kanban", size=24, weight=ft.FontWeight.BOLD),
-                    ft.Text("Drag and drop orders to update their status.", italic=True, color=ft.Colors.GREY_700)
+                    ft.Text("Kanban de Produção", size=24, weight=ft.FontWeight.BOLD),
+                    ft.Text("Arraste e solte os pedidos para atualizar o status.", italic=True, color=ft.Colors.GREY_700)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
                 ft.Container(content=kanban_board, expand=True)

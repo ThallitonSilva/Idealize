@@ -69,9 +69,9 @@ class AppRouter:
             self.page.views.append(
                 ft.View(
                     route="/error",
-                    appbar=ft.AppBar(title=ft.Text("Error"), bgcolor=ft.Colors.RED_700),
+                    appbar=ft.AppBar(title=ft.Text("Erro"), bgcolor=ft.Colors.RED_700),
                     controls=[
-                        ft.Text(f"An error occurred while routing to {self.page.route}:", size=18, color=ft.Colors.RED),
+                        ft.Text(f"Ocorreu um erro ao rotear para {self.page.route}:", size=18, color=ft.Colors.RED),
                         ft.Text(str(e))
                     ]
                 )

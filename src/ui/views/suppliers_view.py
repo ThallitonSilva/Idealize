@@ -4,7 +4,7 @@ from database import get_db_connection
 
 class SuppliersView(BaseView):
     def __init__(self, page: ft.Page):
-        super().__init__(page, "/suppliers", "Suppliers")
+        super().__init__(page, "/suppliers", "Fornecedores")
         self.suppliers_list = ft.ListView(expand=True, spacing=10)
         self.load_suppliers()
 
@@ -18,7 +18,7 @@ class SuppliersView(BaseView):
         conn.close()
 
         if not suppliers:
-            self.suppliers_list.controls.append(ft.Text("No suppliers registered yet.", italic=True))
+            self.suppliers_list.controls.append(ft.Text("Nenhum fornecedor registrado ainda.", italic=True))
         else:
             for supplier in suppliers:
                 self.suppliers_list.controls.append(
@@ -27,22 +27,24 @@ class SuppliersView(BaseView):
                             padding=10,
                             content=ft.Column([
                                 ft.Text(supplier['name'], size=16, weight=ft.FontWeight.BOLD),
-                                ft.Text(f"Phone: {supplier['contact_phone'] or 'N/A'} | Email: {supplier['contact_email'] or 'N/A'}"),
-                                ft.Text(f"Address: {supplier['address'] or 'N/A'}")
+                                ft.Text(f"Telefone: {supplier['contact_phone'] or 'N/A'} | E-mail: {supplier['contact_email'] or 'N/A'}"),
+                                ft.Text(f"Endereço: {supplier['address'] or 'N/A'}")
                             ])
                         )
                     )
                 )
 
     def show_add_dialog(self, e):
+        dialog = None
+
         def close_dlg(e):
-            self.page.pop_dialog()
+            dialog.open = False
             self.page.update()
 
         def save_supplier(e):
             name = name_input.value
             if not name:
-                error_text.value = "Name is required."
+                error_text.value = "O nome é obrigatório."
                 error_text.visible = True
                 self.page.update()
                 return
@@ -63,33 +65,33 @@ class SuppliersView(BaseView):
             self.load_suppliers()
             close_dlg(e)
 
-        name_input = ft.TextField(label="Supplier Name")
-        phone_input = ft.TextField(label="Phone")
-        email_input = ft.TextField(label="Email")
-        address_input = ft.TextField(label="Address")
+        name_input = ft.TextField(label="Nome do Fornecedor")
+        phone_input = ft.TextField(label="Telefone")
+        email_input = ft.TextField(label="E-mail")
+        address_input = ft.TextField(label="Endereço")
         error_text = ft.Text(color=ft.Colors.RED, visible=False)
 
         dialog = ft.AlertDialog(
-            title=ft.Text("Add Supplier"),
+            title=ft.Text("Adicionar Fornecedor"),
             content=ft.Column([
                 name_input, phone_input, email_input, address_input, error_text
             ], tight=True),
             actions=[
-                ft.TextButton("Cancel", on_click=close_dlg),
-                ft.ElevatedButton("Save", on_click=save_supplier, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                ft.TextButton("Cancelar", on_click=close_dlg),
+                ft.ElevatedButton("Salvar", on_click=save_supplier, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
 
-        self.page.show_dialog(dialog)
-
+        self.page.overlay.append(dialog)
+        dialog.open = True
         self.page.update()
 
     def build_content(self):
         return ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Text("Suppliers", size=24, weight=ft.FontWeight.BOLD),
-                    ft.ElevatedButton("Add Supplier", icon=ft.Icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                    ft.Text("Fornecedores", size=24, weight=ft.FontWeight.BOLD),
+                    ft.ElevatedButton("Adicionar Fornecedor", icon=ft.Icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
                 self.suppliers_list

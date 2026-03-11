@@ -49,7 +49,7 @@ class DashboardView(BaseView):
 
             fig, ax = plt.subplots(figsize=(5, 3))
             ax.bar(labels, values, color='#1976D2')
-            ax.set_title('Top 5 Products Sold')
+            ax.set_title('Top 5 Produtos Mais Vendidos')
             plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
 
@@ -61,21 +61,21 @@ class DashboardView(BaseView):
 
             chart_image = ft.Image(src_base64=img_str, width=500, height=300)
 
-        top_prod_controls = [ft.Text("Top 5 Products", weight=ft.FontWeight.BOLD)]
+        top_prod_controls = [ft.Text("Top 5 Produtos", weight=ft.FontWeight.BOLD)]
         for i, p in enumerate(top_products):
-            top_prod_controls.append(ft.Text(f"{i+1}. {p['description']} (Qty: {p['total_qty']})"))
+            top_prod_controls.append(ft.Text(f"{i+1}. {p['description']} (Qtd: {p['total_qty']})"))
 
         if not top_products:
-            top_prod_controls.append(ft.Text("No sales data yet."))
+            top_prod_controls.append(ft.Text("Nenhum dado de venda ainda."))
 
         return ft.Container(
             content=ft.ListView([
-                ft.Text(f"Welcome back, {self.username}!", size=30, weight=ft.FontWeight.BOLD),
+                ft.Text(f"Bem-vindo(a) de volta, {self.username}!", size=30, weight=ft.FontWeight.BOLD),
                 ft.Divider(),
                 ft.Row([
-                    self._create_metric_card("Total Revenue", f"R$ {revenue:,.2f}", ft.Icons.MONEY, ft.Colors.GREEN_700),
-                    self._create_metric_card("Approved Quotes", str(approved_count), ft.Icons.CHECK_CIRCLE, ft.Colors.BLUE_700),
-                    self._create_metric_card("Open Quotes", str(open_count), ft.Icons.PENDING_ACTIONS, ft.Colors.ORANGE_700),
+                    self._create_metric_card("Receita Total", f"R$ {revenue:,.2f}", ft.Icons.MONEY, ft.Colors.GREEN_700),
+                    self._create_metric_card("Orçamentos Aprovados", str(approved_count), ft.Icons.CHECK_CIRCLE, ft.Colors.BLUE_700),
+                    self._create_metric_card("Orçamentos Abertos", str(open_count), ft.Icons.PENDING_ACTIONS, ft.Colors.ORANGE_700),
                 ], alignment=ft.MainAxisAlignment.START, spacing=20),
                 ft.Container(height=30),
                 ft.Row([

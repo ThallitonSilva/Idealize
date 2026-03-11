@@ -4,7 +4,7 @@ from database import get_db_connection
 
 class MaterialsView(BaseView):
     def __init__(self, page: ft.Page):
-        super().__init__(page, "/materials", "Materials")
+        super().__init__(page, "/materials", "Materiais")
         self.materials_list = ft.ListView(expand=True, spacing=10)
         self.load_materials()
 
@@ -18,7 +18,7 @@ class MaterialsView(BaseView):
         conn.close()
 
         if not materials:
-            self.materials_list.controls.append(ft.Text("No materials registered yet.", italic=True))
+            self.materials_list.controls.append(ft.Text("Nenhum material registrado ainda.", italic=True))
         else:
             for material in materials:
                 dims = f"{material['width_cm']}x{material['height_cm']}cm" if material['width_cm'] and material['height_cm'] else "N/A"
@@ -31,17 +31,19 @@ class MaterialsView(BaseView):
                             padding=10,
                             content=ft.Column([
                                 ft.Text(material['name'], size=16, weight=ft.FontWeight.BOLD),
-                                ft.Text(f"Type/Color: {material['type_thickness_color']} | Unit: {material['unit']}"),
-                                ft.Text(f"Dimensions: {dims} | Area: {area_m2}"),
-                                ft.Text(f"Cost: {cost_m2}", color=ft.Colors.GREEN_700, weight=ft.FontWeight.W_600)
+                                ft.Text(f"Tipo/Cor: {material['type_thickness_color']} | Unidade: {material['unit']}"),
+                                ft.Text(f"Dimensões: {dims} | Área: {area_m2}"),
+                                ft.Text(f"Custo: {cost_m2}", color=ft.Colors.GREEN_700, weight=ft.FontWeight.W_600)
                             ])
                         )
                     )
                 )
 
     def show_add_dialog(self, e):
+        dialog = None
+
         def close_dlg(e):
-            self.page.pop_dialog()
+            dialog.open = False
             self.page.update()
 
         def save_material(e):
@@ -50,7 +52,7 @@ class MaterialsView(BaseView):
             unit = unit_dropdown.value
 
             if not name or not unit:
-                error_text.value = "Name and Unit are required."
+                error_text.value = "Nome e Unidade são obrigatórios."
                 error_text.visible = True
                 self.page.update()
                 return
@@ -77,43 +79,43 @@ class MaterialsView(BaseView):
             self.load_materials()
             close_dlg(e)
 
-        name_input = ft.TextField(label="Material Name")
-        desc_input = ft.TextField(label="Type / Thickness / Color")
+        name_input = ft.TextField(label="Nome do Material")
+        desc_input = ft.TextField(label="Tipo / Espessura / Cor")
         unit_dropdown = ft.Dropdown(
-            label="Unit",
+            label="Unidade",
             options=[
-                ft.dropdown.Option("Plate"),
-                ft.dropdown.Option("Sheet"),
-                ft.dropdown.Option("Meter"),
-                ft.dropdown.Option("Unit")
+                ft.dropdown.Option("Plate", "Chapa"),
+                ft.dropdown.Option("Sheet", "Folha"),
+                ft.dropdown.Option("Meter", "Metro"),
+                ft.dropdown.Option("Unit", "Unidade")
             ],
             value="Plate"
         )
-        width_input = ft.TextField(label="Width (cm)", keyboard_type=ft.KeyboardType.NUMBER)
-        height_input = ft.TextField(label="Height (cm)", keyboard_type=ft.KeyboardType.NUMBER)
+        width_input = ft.TextField(label="Largura (cm)", keyboard_type=ft.KeyboardType.NUMBER)
+        height_input = ft.TextField(label="Altura (cm)", keyboard_type=ft.KeyboardType.NUMBER)
         error_text = ft.Text(color=ft.Colors.RED, visible=False)
 
         dialog = ft.AlertDialog(
-            title=ft.Text("Add Material"),
+            title=ft.Text("Adicionar Material"),
             content=ft.Column([
                 name_input, desc_input, unit_dropdown, width_input, height_input, error_text
             ], tight=True),
             actions=[
-                ft.TextButton("Cancel", on_click=close_dlg),
-                ft.ElevatedButton("Save", on_click=save_material, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                ft.TextButton("Cancelar", on_click=close_dlg),
+                ft.ElevatedButton("Salvar", on_click=save_material, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
 
-        self.page.show_dialog(dialog)
-
+        self.page.overlay.append(dialog)
+        dialog.open = True
         self.page.update()
 
     def build_content(self):
         return ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Text("Materials Catalog", size=24, weight=ft.FontWeight.BOLD),
-                    ft.ElevatedButton("Add Material", icon=ft.Icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                    ft.Text("Catálogo de Materiais", size=24, weight=ft.FontWeight.BOLD),
+                    ft.ElevatedButton("Adicionar Material", icon=ft.Icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
                 self.materials_list

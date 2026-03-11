@@ -5,7 +5,7 @@ from datetime import datetime
 
 class PurchasesView(BaseView):
     def __init__(self, page: ft.Page):
-        super().__init__(page, "/purchases", "Purchases")
+        super().__init__(page, "/purchases", "Compras")
         self.purchases_list = ft.ListView(expand=True, spacing=10)
         self.load_purchases()
 
@@ -25,7 +25,7 @@ class PurchasesView(BaseView):
         conn.close()
 
         if not purchases:
-            self.purchases_list.controls.append(ft.Text("No purchases registered yet.", italic=True))
+            self.purchases_list.controls.append(ft.Text("Nenhuma compra registrada ainda.", italic=True))
         else:
             for p in purchases:
                 qty = p['quantity'] if 'quantity' in p.keys() else 1.0
@@ -34,17 +34,19 @@ class PurchasesView(BaseView):
                         content=ft.Container(
                             padding=10,
                             content=ft.Column([
-                                ft.Text(f"{p['material_name']} from {p['supplier_name']}", size=16, weight=ft.FontWeight.BOLD),
-                                ft.Text(f"Date: {p['purchase_date']} | Qty: {qty} | Total Cost: R$ {p['cost_price']:.2f}"),
-                                ft.Text(f"Lot Code: {p['lot_code'] or 'N/A'}")
+                                ft.Text(f"{p['material_name']} de {p['supplier_name']}", size=16, weight=ft.FontWeight.BOLD),
+                                ft.Text(f"Data: {p['purchase_date']} | Qtd: {qty} | Custo Total: R$ {p['cost_price']:.2f}"),
+                                ft.Text(f"Lote: {p['lot_code'] or 'N/A'}")
                             ])
                         )
                     )
                 )
 
     def show_add_dialog(self, e):
+        dialog = None
+
         def close_dlg(e):
-            self.page.pop_dialog()
+            dialog.open = False
             self.page.update()
 
         def save_purchase(e):
@@ -56,7 +58,7 @@ class PurchasesView(BaseView):
             lot_code = lot_input.value
 
             if not mat_id or not sup_id or not date_val or not cost_val or not qty_val:
-                error_text.value = "Material, Supplier, Date, Quantity and Cost are required."
+                error_text.value = "Material, Fornecedor, Data, Quantidade e Custo são obrigatórios."
                 error_text.visible = True
                 self.page.update()
                 return
@@ -65,7 +67,7 @@ class PurchasesView(BaseView):
                 cost_val = float(cost_val)
                 qty_val = float(qty_val)
             except ValueError:
-                error_text.value = "Cost and Quantity must be valid numbers."
+                error_text.value = "Custo e Quantidade devem ser números válidos."
                 error_text.visible = True
                 self.page.update()
                 return
@@ -115,36 +117,36 @@ class PurchasesView(BaseView):
             options=[ft.dropdown.Option(str(m['id']), m['name']) for m in materials]
         )
         supplier_dropdown = ft.Dropdown(
-            label="Supplier",
+            label="Fornecedor",
             options=[ft.dropdown.Option(str(s['id']), s['name']) for s in suppliers]
         )
-        date_input = ft.TextField(label="Purchase Date (YYYY-MM-DD)", value=datetime.now().strftime("%Y-%m-%d"))
-        qty_input = ft.TextField(label="Quantity (Sheets/Plates/Units)", value="1", keyboard_type=ft.KeyboardType.NUMBER)
-        cost_input = ft.TextField(label="Total Cost Price", keyboard_type=ft.KeyboardType.NUMBER)
-        lot_input = ft.TextField(label="Lot Code (Optional)")
+        date_input = ft.TextField(label="Data da Compra (AAAA-MM-DD)", value=datetime.now().strftime("%Y-%m-%d"))
+        qty_input = ft.TextField(label="Quantidade (Chapas/Folhas/Unidades)", value="1", keyboard_type=ft.KeyboardType.NUMBER)
+        cost_input = ft.TextField(label="Custo Total", keyboard_type=ft.KeyboardType.NUMBER)
+        lot_input = ft.TextField(label="Código do Lote (Opcional)")
         error_text = ft.Text(color=ft.Colors.RED, visible=False)
 
         dialog = ft.AlertDialog(
-            title=ft.Text("Register Purchase"),
+            title=ft.Text("Registrar Compra"),
             content=ft.Column([
                 material_dropdown, supplier_dropdown, date_input, qty_input, cost_input, lot_input, error_text
             ], tight=True),
             actions=[
-                ft.TextButton("Cancel", on_click=close_dlg),
-                ft.ElevatedButton("Save", on_click=save_purchase, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                ft.TextButton("Cancelar", on_click=close_dlg),
+                ft.ElevatedButton("Salvar", on_click=save_purchase, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
 
-        self.page.show_dialog(dialog)
-
+        self.page.overlay.append(dialog)
+        dialog.open = True
         self.page.update()
 
     def build_content(self):
         return ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Text("Purchase History", size=24, weight=ft.FontWeight.BOLD),
-                    ft.ElevatedButton("Register Purchase", icon=ft.Icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                    ft.Text("Histórico de Compras", size=24, weight=ft.FontWeight.BOLD),
+                    ft.ElevatedButton("Registrar Compra", icon=ft.Icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
                 self.purchases_list

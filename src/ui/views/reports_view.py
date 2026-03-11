@@ -13,7 +13,7 @@ from datetime import datetime
 
 class ReportsView(BaseView):
     def __init__(self, page: ft.Page):
-        super().__init__(page, "/reports", "Reports")
+        super().__init__(page, "/reports", "Relatórios")
 
     def build_content(self):
         conn = get_db_connection()
@@ -57,10 +57,10 @@ class ReportsView(BaseView):
 
         # Profitability Table
         dt_columns = [
-            ft.DataColumn(ft.Text("Customer")),
-            ft.DataColumn(ft.Text("Revenue (R$)", text_align="right")),
-            ft.DataColumn(ft.Text("Costs (R$)", text_align="right")),
-            ft.DataColumn(ft.Text("Profit (R$)", text_align="right"))
+            ft.DataColumn(ft.Text("Cliente")),
+            ft.DataColumn(ft.Text("Receita (R$)", text_align="right")),
+            ft.DataColumn(ft.Text("Custos (R$)", text_align="right")),
+            ft.DataColumn(ft.Text("Lucro (R$)", text_align="right"))
         ]
 
         dt_rows = []
@@ -76,7 +76,7 @@ class ReportsView(BaseView):
                 )
             )
 
-        profit_table = ft.DataTable(columns=dt_columns, rows=dt_rows) if dt_rows else ft.Text("No data available.")
+        profit_table = ft.DataTable(columns=dt_columns, rows=dt_rows) if dt_rows else ft.Text("Nenhum dado disponível.")
 
         # Price Evolution Chart
         chart_image = None
@@ -86,9 +86,9 @@ class ReportsView(BaseView):
             for name, group in df.groupby('name'):
                 ax.plot(group['month'], group['avg_cost_cm2'], marker='o', label=name)
 
-            ax.set_title('Material Cost per cm² Evolution')
-            ax.set_xlabel('Month')
-            ax.set_ylabel('Avg Cost / cm² (R$)')
+            ax.set_title('Evolução do Custo do Material por cm²')
+            ax.set_xlabel('Mês')
+            ax.set_ylabel('Custo Médio / cm² (R$)')
             plt.xticks(rotation=45)
             ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
             plt.tight_layout()
@@ -112,11 +112,11 @@ class ReportsView(BaseView):
             fig2, ax2 = plt.subplots(figsize=(8, 4))
             pivot_df.plot(kind='bar', ax=ax2)
 
-            ax2.set_title('Material Cost by Supplier')
+            ax2.set_title('Custo do Material por Fornecedor')
             ax2.set_xlabel('Material')
-            ax2.set_ylabel('Avg Cost / cm² (R$)')
+            ax2.set_ylabel('Custo Médio / cm² (R$)')
             plt.xticks(rotation=45, ha='right')
-            ax2.legend(title='Supplier', bbox_to_anchor=(1.05, 1), loc='upper left')
+            ax2.legend(title='Fornecedor', bbox_to_anchor=(1.05, 1), loc='upper left')
             plt.tight_layout()
 
             buf2 = BytesIO()
@@ -132,37 +132,37 @@ class ReportsView(BaseView):
             if not os.path.exists(exports_dir):
                 os.makedirs(exports_dir)
 
-            filename = f"profitability_report_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
+            filename = f"relatorio_lucratividade_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
             filepath = os.path.join(exports_dir, filename)
 
             with open(filepath, 'w', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow(["Customer", "Revenue", "Costs", "Profit"])
+                writer.writerow(["Cliente", "Receita", "Custos", "Lucro"])
                 for row in profit_by_cust:
                     writer.writerow([row['name'], f"{row['revenue']:.2f}", f"{row['costs']:.2f}", f"{row['profit']:.2f}"])
 
-            self.page.overlay.append(ft.SnackBar(ft.Text(f"Exported to {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
+            self.page.overlay.append(ft.SnackBar(ft.Text(f"Exportado para {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
             self.page.launch_url(f"/{filename}")
             self.page.update()
 
         return ft.Container(
             content=ft.ListView([
                 ft.Row([
-                    ft.Text("Business Intelligence & Reports", size=24, weight=ft.FontWeight.BOLD),
-                    ft.ElevatedButton("Export Profitability to CSV", icon=ft.Icons.DOWNLOAD, on_click=export_csv, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                    ft.Text("Business Intelligence & Relatórios", size=24, weight=ft.FontWeight.BOLD),
+                    ft.ElevatedButton("Exportar Lucratividade para CSV", icon=ft.Icons.DOWNLOAD, on_click=export_csv, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
 
-                ft.Text("Profitability by Customer", size=20, weight=ft.FontWeight.W_600),
+                ft.Text("Lucratividade por Cliente", size=20, weight=ft.FontWeight.W_600),
                 profit_table,
                 ft.Container(height=30),
 
-                ft.Text("Input Price Evolution (Cost per cm²)", size=20, weight=ft.FontWeight.W_600),
-                chart_image if chart_image else ft.Text("No purchase data available to chart."),
+                ft.Text("Evolução do Preço do Insumo (Custo por cm²)", size=20, weight=ft.FontWeight.W_600),
+                chart_image if chart_image else ft.Text("Nenhum dado de compra disponível para gerar gráfico."),
                 ft.Container(height=30),
 
-                ft.Text("Supplier Price Comparison", size=20, weight=ft.FontWeight.W_600),
-                supplier_chart_image if supplier_chart_image else ft.Text("Not enough data to compare suppliers.")
+                ft.Text("Comparação de Preços entre Fornecedores", size=20, weight=ft.FontWeight.W_600),
+                supplier_chart_image if supplier_chart_image else ft.Text("Dados insuficientes para comparar fornecedores.")
             ], expand=True, spacing=10),
             padding=20,
             expand=True

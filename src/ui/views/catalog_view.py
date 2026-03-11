@@ -7,7 +7,7 @@ from datetime import datetime
 
 class CatalogView(BaseView):
     def __init__(self, page: ft.Page):
-        super().__init__(page, "/catalog", "Catalog")
+        super().__init__(page, "/catalog", "Catálogo")
         self.catalog_list = ft.ListView(expand=True, spacing=10)
         self.settings = self._load_settings()
         self.load_catalog()
@@ -48,7 +48,7 @@ class CatalogView(BaseView):
         conn.close()
 
         if not products and not kits:
-            self.catalog_list.controls.append(ft.Text("No products in the catalog yet.", italic=True))
+            self.catalog_list.controls.append(ft.Text("Nenhum produto no catálogo ainda.", italic=True))
         else:
             # Display Standard Products with Dynamic Pricing Calculation
             for p in products:
@@ -58,7 +58,7 @@ class CatalogView(BaseView):
                 markup = 2.0  # Default display markup
                 display_price = current_cost * markup
 
-                variation_label = p['variation_name'] if p.get('variation_name') else 'Standard'
+                variation_label = p['variation_name'] if p.get('variation_name') else 'Padrão'
                 title_text = f"{p['name']} ({variation_label})"
 
                 self.catalog_list.controls.append(
@@ -69,12 +69,12 @@ class CatalogView(BaseView):
                                 ft.Row([
                                     ft.Text(title_text, size=18, weight=ft.FontWeight.BOLD),
                                     ft.Row([
-                                        ft.IconButton(ft.Icons.ADD_BOX, tooltip="Add Variation", on_click=lambda e, pid=p['id'], pname=p['name']: self.show_add_variation_dialog(pid, pname)),
-                                        ft.Container(content=ft.Text("Product", size=10, color=ft.Colors.WHITE), bgcolor=ft.Colors.BLUE_700, padding=3, border_radius=3)
+                                        ft.IconButton(ft.Icons.ADD_BOX, tooltip="Adicionar Variação", on_click=lambda e, pid=p['id'], pname=p['name']: self.show_add_variation_dialog(pid, pname)),
+                                        ft.Container(content=ft.Text("Produto", size=10, color=ft.Colors.WHITE), bgcolor=ft.Colors.BLUE_700, padding=3, border_radius=3)
                                     ])
                                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                                ft.Text(f"Material: {p['mat_name']} | Dims: {p['width_cm']}x{p['height_cm']}cm"),
-                                ft.Text(f"Base Cost: R$ {current_cost:.2f} | Est. Retail Price: R$ {display_price:.2f}", weight=ft.FontWeight.W_500, color=ft.Colors.GREEN_700)
+                                ft.Text(f"Material: {p['mat_name']} | Dim: {p['width_cm']}x{p['height_cm']}cm"),
+                                ft.Text(f"Custo Base: R$ {current_cost:.2f} | Preço de Venda Est.: R$ {display_price:.2f}", weight=ft.FontWeight.W_500, color=ft.Colors.GREEN_700)
                             ])
                         )
                     )
@@ -100,8 +100,8 @@ class CatalogView(BaseView):
                                     ft.Text(k['name'], size=18, weight=ft.FontWeight.BOLD),
                                     ft.Container(content=ft.Text("Kit", size=10, color=ft.Colors.BLACK), bgcolor=ft.Colors.AMBER_400, padding=3, border_radius=3)
                                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                                ft.Text(k['description'] or "A composite product kit."),
-                                ft.Text(f"Total Base Cost: R$ {kit_cost:.2f} | Kit Price: R$ {display_price:.2f}", weight=ft.FontWeight.W_500, color=ft.Colors.GREEN_700)
+                                ft.Text(k['description'] or "Um kit de produtos compostos."),
+                                ft.Text(f"Custo Base Total: R$ {kit_cost:.2f} | Preço do Kit: R$ {display_price:.2f}", weight=ft.FontWeight.W_500, color=ft.Colors.GREEN_700)
                             ])
                         )
                     )
@@ -153,19 +153,21 @@ class CatalogView(BaseView):
         materials = c.fetchall()
         conn.close()
 
-        name_input = ft.TextField(label="Product Name")
-        desc_input = ft.TextField(label="Description", multiline=True)
+        name_input = ft.TextField(label="Nome do Produto")
+        desc_input = ft.TextField(label="Descrição", multiline=True)
 
         mat_dd = ft.Dropdown(label="Material", options=[ft.dropdown.Option(str(m['id']), m['name']) for m in materials])
-        w_input = ft.TextField(label="Width (cm)", keyboard_type=ft.KeyboardType.NUMBER)
-        h_input = ft.TextField(label="Height (cm)", keyboard_type=ft.KeyboardType.NUMBER)
-        mach_input = ft.TextField(label="Machine Time (min)", keyboard_type=ft.KeyboardType.NUMBER)
-        man_input = ft.TextField(label="Manual Time (min)", keyboard_type=ft.KeyboardType.NUMBER)
-        extra_input = ft.TextField(label="Extra Fixed Costs (R$)", keyboard_type=ft.KeyboardType.NUMBER)
+        w_input = ft.TextField(label="Largura (cm)", keyboard_type=ft.KeyboardType.NUMBER)
+        h_input = ft.TextField(label="Altura (cm)", keyboard_type=ft.KeyboardType.NUMBER)
+        mach_input = ft.TextField(label="Tempo de Máquina (min)", keyboard_type=ft.KeyboardType.NUMBER)
+        man_input = ft.TextField(label="Tempo Manual (min)", keyboard_type=ft.KeyboardType.NUMBER)
+        extra_input = ft.TextField(label="Custos Fixos Extras (R$)", keyboard_type=ft.KeyboardType.NUMBER)
+
+        dlg = None
 
         def save_product(e):
             if not name_input.value or not mat_dd.value:
-                self.page.overlay.append(ft.SnackBar(ft.Text("Name and Material are required."), bgcolor=ft.Colors.RED, open=True))
+                self.page.overlay.append(ft.SnackBar(ft.Text("O Nome e o Material são obrigatórios."), bgcolor=ft.Colors.RED, open=True))
                 self.page.update()
                 return
 
@@ -182,24 +184,28 @@ class CatalogView(BaseView):
             conn.commit()
             conn.close()
 
-            self.page.pop_dialog()
+            dlg.open = False
             self.load_catalog()
             self.page.update()
 
+        def close_dlg(e):
+            dlg.open = False
+            self.page.update()
+
         dlg = ft.AlertDialog(
-            title=ft.Text("Add New Product"),
+            title=ft.Text("Adicionar Novo Produto"),
             content=ft.Column([
                 name_input, desc_input,
-                ft.Text("Component Recipe", weight=ft.FontWeight.BOLD),
+                ft.Text("Receita do Componente", weight=ft.FontWeight.BOLD),
                 mat_dd, ft.Row([w_input, h_input]), ft.Row([mach_input, man_input]), extra_input
             ], tight=True),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: self.page.pop_dialog() or self.page.update()),
-                ft.ElevatedButton("Save Product", on_click=save_product, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                ft.TextButton("Cancelar", on_click=close_dlg),
+                ft.ElevatedButton("Salvar Produto", on_click=save_product, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
-        self.page.show_dialog(dlg)
-
+        self.page.overlay.append(dlg)
+        dlg.open = True
         self.page.update()
 
     def show_add_variation_dialog(self, product_id, product_name):
@@ -209,17 +215,19 @@ class CatalogView(BaseView):
         materials = c.fetchall()
         conn.close()
 
-        var_name_input = ft.TextField(label="Variation Name (e.g. Acrilico Preto)")
+        var_name_input = ft.TextField(label="Nome da Variação (ex. Acrílico Preto)")
         mat_dd = ft.Dropdown(label="Material", options=[ft.dropdown.Option(str(m['id']), m['name']) for m in materials])
-        w_input = ft.TextField(label="Width (cm)", keyboard_type=ft.KeyboardType.NUMBER)
-        h_input = ft.TextField(label="Height (cm)", keyboard_type=ft.KeyboardType.NUMBER)
-        mach_input = ft.TextField(label="Machine Time (min)", keyboard_type=ft.KeyboardType.NUMBER)
-        man_input = ft.TextField(label="Manual Time (min)", keyboard_type=ft.KeyboardType.NUMBER)
-        extra_input = ft.TextField(label="Extra Fixed Costs (R$)", keyboard_type=ft.KeyboardType.NUMBER)
+        w_input = ft.TextField(label="Largura (cm)", keyboard_type=ft.KeyboardType.NUMBER)
+        h_input = ft.TextField(label="Altura (cm)", keyboard_type=ft.KeyboardType.NUMBER)
+        mach_input = ft.TextField(label="Tempo de Máquina (min)", keyboard_type=ft.KeyboardType.NUMBER)
+        man_input = ft.TextField(label="Tempo Manual (min)", keyboard_type=ft.KeyboardType.NUMBER)
+        extra_input = ft.TextField(label="Custos Fixos Extras (R$)", keyboard_type=ft.KeyboardType.NUMBER)
+
+        dlg = None
 
         def save_variation(e):
             if not var_name_input.value or not mat_dd.value:
-                self.page.overlay.append(ft.SnackBar(ft.Text("Variation Name and Material are required."), bgcolor=ft.Colors.RED, open=True))
+                self.page.overlay.append(ft.SnackBar(ft.Text("O Nome da Variação e o Material são obrigatórios."), bgcolor=ft.Colors.RED, open=True))
                 self.page.update()
                 return
 
@@ -234,24 +242,28 @@ class CatalogView(BaseView):
             conn.commit()
             conn.close()
 
-            self.page.pop_dialog()
+            dlg.open = False
             self.load_catalog()
             self.page.update()
 
+        def close_dlg(e):
+            dlg.open = False
+            self.page.update()
+
         dlg = ft.AlertDialog(
-            title=ft.Text(f"Add Variation to: {product_name}"),
+            title=ft.Text(f"Adicionar Variação para: {product_name}"),
             content=ft.Column([
                 var_name_input,
-                ft.Text("Variation Recipe", weight=ft.FontWeight.BOLD),
+                ft.Text("Receita da Variação", weight=ft.FontWeight.BOLD),
                 mat_dd, ft.Row([w_input, h_input]), ft.Row([mach_input, man_input]), extra_input
             ], tight=True),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: self.page.pop_dialog() or self.page.update()),
-                ft.ElevatedButton("Save Variation", on_click=save_variation, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                ft.TextButton("Cancelar", on_click=close_dlg),
+                ft.ElevatedButton("Salvar Variação", on_click=save_variation, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
-        self.page.show_dialog(dlg)
-
+        self.page.overlay.append(dlg)
+        dlg.open = True
         self.page.update()
 
     def show_add_kit_dialog(self, e):
@@ -261,16 +273,16 @@ class CatalogView(BaseView):
         standard_products = c.fetchall()
         conn.close()
 
-        kit_name_input = ft.TextField(label="Kit Name")
-        kit_desc_input = ft.TextField(label="Kit Description", multiline=True)
-        discount_type_dd = ft.Dropdown(label="Discount Type", options=[ft.dropdown.Option("Fixed"), ft.dropdown.Option("Percentage")])
-        discount_value_input = ft.TextField(label="Discount Value", keyboard_type=ft.KeyboardType.NUMBER)
+        kit_name_input = ft.TextField(label="Nome do Kit")
+        kit_desc_input = ft.TextField(label="Descrição do Kit", multiline=True)
+        discount_type_dd = ft.Dropdown(label="Tipo de Desconto", options=[ft.dropdown.Option("Fixed", "Fixo"), ft.dropdown.Option("Percentage", "Porcentagem")])
+        discount_value_input = ft.TextField(label="Valor do Desconto", keyboard_type=ft.KeyboardType.NUMBER)
 
         selected_components = []
         components_listview = ft.ListView(height=100, spacing=5)
 
-        comp_dd = ft.Dropdown(label="Select Product", options=[ft.dropdown.Option(str(p['id']), p['name']) for p in standard_products])
-        comp_qty = ft.TextField(label="Qty", value="1", keyboard_type=ft.KeyboardType.NUMBER, width=60)
+        comp_dd = ft.Dropdown(label="Selecionar Produto", options=[ft.dropdown.Option(str(p['id']), p['name']) for p in standard_products])
+        comp_qty = ft.TextField(label="Qtd", value="1", keyboard_type=ft.KeyboardType.NUMBER, width=60)
 
         def add_component_to_kit(e):
             if comp_dd.value:
@@ -281,9 +293,11 @@ class CatalogView(BaseView):
                 components_listview.controls.append(ft.Text(f"{qty}x {p_name}"))
                 self.page.update()
 
+        dlg = None
+
         def save_kit(e):
             if not kit_name_input.value or not selected_components:
-                self.page.overlay.append(ft.SnackBar(ft.Text("Name and at least 1 component are required."), bgcolor=ft.Colors.RED, open=True))
+                self.page.overlay.append(ft.SnackBar(ft.Text("O Nome e pelo menos 1 componente são obrigatórios."), bgcolor=ft.Colors.RED, open=True))
                 self.page.update()
                 return
 
@@ -303,27 +317,31 @@ class CatalogView(BaseView):
             conn.commit()
             conn.close()
 
-            self.page.pop_dialog()
+            dlg.open = False
             self.load_catalog()
             self.page.update()
 
+        def close_dlg(e):
+            dlg.open = False
+            self.page.update()
+
         dlg = ft.AlertDialog(
-            title=ft.Text("Create New Kit"),
+            title=ft.Text("Criar Novo Kit"),
             content=ft.Column([
                 kit_name_input, kit_desc_input,
                 ft.Row([discount_type_dd, discount_value_input]),
                 ft.Divider(),
-                ft.Text("Kit Components", weight=ft.FontWeight.BOLD),
+                ft.Text("Componentes do Kit", weight=ft.FontWeight.BOLD),
                 ft.Row([comp_dd, comp_qty, ft.IconButton(ft.Icons.ADD, on_click=add_component_to_kit)]),
                 components_listview
             ], tight=True),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: self.page.pop_dialog() or self.page.update()),
-                ft.ElevatedButton("Save Kit", on_click=save_kit, bgcolor=ft.Colors.AMBER_600, color=ft.Colors.BLACK)
+                ft.TextButton("Cancelar", on_click=close_dlg),
+                ft.ElevatedButton("Salvar Kit", on_click=save_kit, bgcolor=ft.Colors.AMBER_600, color=ft.Colors.BLACK)
             ]
         )
-        self.page.show_dialog(dlg)
-
+        self.page.overlay.append(dlg)
+        dlg.open = True
         self.page.update()
 
     def export_csv(self, e):
@@ -371,7 +389,7 @@ class CatalogView(BaseView):
                     price *= (1 - (k['kit_discount_value'] / 100.0))
                 writer.writerow(["Kit", k['name'], k['description'] or '', f"{cost:.2f}", f"{price:.2f}"])
 
-        self.page.overlay.append(ft.SnackBar(ft.Text(f"Exported to {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text(f"Exportado para {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.page.launch_url(f"/{filename}")
         self.page.update()
 
@@ -379,14 +397,14 @@ class CatalogView(BaseView):
         return ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Text("Product Catalog", size=24, weight=ft.FontWeight.BOLD),
+                    ft.Text("Catálogo de Produtos", size=24, weight=ft.FontWeight.BOLD),
                     ft.Row([
-                        ft.ElevatedButton("Export CSV", icon=ft.Icons.DOWNLOAD, on_click=self.export_csv, bgcolor=ft.Colors.GREEN_700, color=ft.Colors.WHITE),
-                        ft.ElevatedButton("Create Kit", icon=ft.Icons.LIBRARY_ADD, on_click=self.show_add_kit_dialog, bgcolor=ft.Colors.AMBER_400, color=ft.Colors.BLACK),
-                        ft.ElevatedButton("Add Product", icon=ft.Icons.ADD, on_click=self.show_add_product_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                        ft.ElevatedButton("Exportar CSV", icon=ft.Icons.DOWNLOAD, on_click=self.export_csv, bgcolor=ft.Colors.GREEN_700, color=ft.Colors.WHITE),
+                        ft.ElevatedButton("Criar Kit", icon=ft.Icons.LIBRARY_ADD, on_click=self.show_add_kit_dialog, bgcolor=ft.Colors.AMBER_400, color=ft.Colors.BLACK),
+                        ft.ElevatedButton("Adicionar Produto", icon=ft.Icons.ADD, on_click=self.show_add_product_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                     ])
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                ft.Text("Prices automatically adjust when material or operational costs change in Modules 1 and 2.", italic=True, size=12),
+                ft.Text("Os preços se ajustam automaticamente quando os custos operacionais ou de materiais mudam nos Módulos 1 e 2.", italic=True, size=12),
                 ft.Divider(),
                 self.catalog_list
             ], expand=True),

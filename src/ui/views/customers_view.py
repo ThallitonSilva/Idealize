@@ -7,7 +7,7 @@ from datetime import datetime
 
 class CustomersView(BaseView):
     def __init__(self, page: ft.Page):
-        super().__init__(page, "/customers", "Customers")
+        super().__init__(page, "/customers", "Clientes")
         self.customers_list = ft.ListView(expand=True, spacing=10)
         self.load_customers()
 
@@ -21,7 +21,7 @@ class CustomersView(BaseView):
         conn.close()
 
         if not customers:
-            self.customers_list.controls.append(ft.Text("No customers registered yet.", italic=True))
+            self.customers_list.controls.append(ft.Text("Nenhum cliente registrado ainda.", italic=True))
         else:
             for customer in customers:
                 self.customers_list.controls.append(
@@ -30,22 +30,24 @@ class CustomersView(BaseView):
                             padding=10,
                             content=ft.Column([
                                 ft.Text(customer['name'], size=16, weight=ft.FontWeight.BOLD),
-                                ft.Text(f"Phone: {customer['phone'] or 'N/A'} | Email: {customer['email'] or 'N/A'}"),
-                                ft.Text(f"Address: {customer['address'] or 'N/A'}")
+                                ft.Text(f"Telefone: {customer['phone'] or 'N/A'} | E-mail: {customer['email'] or 'N/A'}"),
+                                ft.Text(f"Endereço: {customer['address'] or 'N/A'}")
                             ])
                         )
                     )
                 )
 
     def show_add_dialog(self, e):
+        dialog = None
+
         def close_dlg(e):
-            self.page.pop_dialog()
+            dialog.open = False
             self.page.update()
 
         def save_customer(e):
             name = name_input.value
             if not name:
-                error_text.value = "Name is required."
+                error_text.value = "O nome é obrigatório."
                 error_text.visible = True
                 self.page.update()
                 return
@@ -66,25 +68,25 @@ class CustomersView(BaseView):
             self.load_customers()
             close_dlg(e)
 
-        name_input = ft.TextField(label="Customer Name")
-        phone_input = ft.TextField(label="Phone")
-        email_input = ft.TextField(label="Email")
-        address_input = ft.TextField(label="Address")
+        name_input = ft.TextField(label="Nome do Cliente")
+        phone_input = ft.TextField(label="Telefone")
+        email_input = ft.TextField(label="E-mail")
+        address_input = ft.TextField(label="Endereço")
         error_text = ft.Text(color=ft.Colors.RED, visible=False)
 
         dialog = ft.AlertDialog(
-            title=ft.Text("Add Customer"),
+            title=ft.Text("Adicionar Cliente"),
             content=ft.Column([
                 name_input, phone_input, email_input, address_input, error_text
             ], tight=True),
             actions=[
-                ft.TextButton("Cancel", on_click=close_dlg),
-                ft.ElevatedButton("Save", on_click=save_customer, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                ft.TextButton("Cancelar", on_click=close_dlg),
+                ft.ElevatedButton("Salvar", on_click=save_customer, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
 
-        self.page.show_dialog(dialog)
-
+        self.page.overlay.append(dialog)
+        dialog.open = True
         self.page.update()
 
     def export_csv(self, e):
@@ -98,16 +100,16 @@ class CustomersView(BaseView):
         if not os.path.exists(exports_dir):
             os.makedirs(exports_dir)
 
-        filename = f"customers_export_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
+        filename = f"clientes_exportacao_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
         filepath = os.path.join(exports_dir, filename)
 
         with open(filepath, 'w', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(["ID", "Name", "Phone", "Email", "Address"])
+            writer.writerow(["ID", "Nome", "Telefone", "E-mail", "Endereço"])
             for row in customers:
                 writer.writerow([row['id'], row['name'], row['phone'], row['email'], row['address']])
 
-        self.page.overlay.append(ft.SnackBar(ft.Text(f"Exported to {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text(f"Exportado para {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.page.launch_url(f"/{filename}")
         self.page.update()
 
@@ -115,10 +117,10 @@ class CustomersView(BaseView):
         return ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Text("Customers (Mini-CRM)", size=24, weight=ft.FontWeight.BOLD),
+                    ft.Text("Clientes (Mini-CRM)", size=24, weight=ft.FontWeight.BOLD),
                     ft.Row([
-                        ft.ElevatedButton("Export CSV", icon=ft.Icons.DOWNLOAD, on_click=self.export_csv, bgcolor=ft.Colors.GREEN_700, color=ft.Colors.WHITE),
-                        ft.ElevatedButton("Add Customer", icon=ft.Icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                        ft.ElevatedButton("Exportar CSV", icon=ft.Icons.DOWNLOAD, on_click=self.export_csv, bgcolor=ft.Colors.GREEN_700, color=ft.Colors.WHITE),
+                        ft.ElevatedButton("Adicionar Cliente", icon=ft.Icons.ADD, on_click=self.show_add_dialog, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                     ])
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),

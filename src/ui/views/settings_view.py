@@ -4,7 +4,7 @@ from database import get_db_connection
 
 class SettingsView(BaseView):
     def __init__(self, page: ft.Page):
-        super().__init__(page, "/settings", "Settings")
+        super().__init__(page, "/settings", "Configurações")
         self.load_settings()
 
     def load_settings(self):
@@ -19,35 +19,35 @@ class SettingsView(BaseView):
 
         # Global Loss Factor
         self.loss_factor_input = ft.TextField(
-            label="Global Loss Factor (%)",
+            label="Fator de Perda Global (%)",
             value=settings_dict.get('global_loss_factor_percent', '10'),
             keyboard_type=ft.KeyboardType.NUMBER
         )
 
         # Labor Minute Cost
         self.labor_cost_input = ft.TextField(
-            label="Labor Minute Cost (R$)",
+            label="Custo do Minuto de Trabalho (R$)",
             value=settings_dict.get('labor_minute_cost', '0.50'),
             keyboard_type=ft.KeyboardType.NUMBER
         )
 
         # Machine Minute Cost calculation fields
-        self.machine_cost_input = ft.TextField(label="Machine Cost (R$)", value=settings_dict.get('machine_monthly_cost', '0'))
-        self.machine_life_input = ft.TextField(label="Useful Life (Months)", value=settings_dict.get('machine_useful_life_months', '60'))
-        self.energy_kwh_input = ft.TextField(label="Energy Consumption (kW/h)", value=settings_dict.get('machine_energy_kwh', '0'))
-        self.kwh_cost_input = ft.TextField(label="Cost per kWh (R$)", value=settings_dict.get('kwh_cost', '0'))
-        self.working_hours_input = ft.TextField(label="Monthly Working Hours", value=settings_dict.get('machine_monthly_hours', '160'))
-        self.maintenance_input = ft.TextField(label="Monthly Maintenance (R$)", value=settings_dict.get('machine_maintenance_cost', '0'))
-        self.other_fixed_input = ft.TextField(label="Other Fixed Costs (R$)", value=settings_dict.get('other_fixed_costs', '0'))
+        self.machine_cost_input = ft.TextField(label="Custo da Máquina (R$)", value=settings_dict.get('machine_monthly_cost', '0'))
+        self.machine_life_input = ft.TextField(label="Vida Útil (Meses)", value=settings_dict.get('machine_useful_life_months', '60'))
+        self.energy_kwh_input = ft.TextField(label="Consumo de Energia (kW/h)", value=settings_dict.get('machine_energy_kwh', '0'))
+        self.kwh_cost_input = ft.TextField(label="Custo por kWh (R$)", value=settings_dict.get('kwh_cost', '0'))
+        self.working_hours_input = ft.TextField(label="Horas de Trabalho Mensais", value=settings_dict.get('machine_monthly_hours', '160'))
+        self.maintenance_input = ft.TextField(label="Manutenção Mensal (R$)", value=settings_dict.get('machine_maintenance_cost', '0'))
+        self.other_fixed_input = ft.TextField(label="Outros Custos Fixos (R$)", value=settings_dict.get('other_fixed_costs', '0'))
 
         self.machine_minute_cost_display = ft.Text(
-            f"Calculated Machine Minute Cost: R$ {settings_dict.get('machine_minute_cost_cached', '0.00')}",
+            f"Custo do Minuto de Máquina Calculado: R$ {settings_dict.get('machine_minute_cost_cached', '0.00')}",
             weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_700
         )
 
         # Taxes
         self.tax_rate_input = ft.TextField(
-            label="Global Tax Rate (e.g., ISS %)",
+            label="Taxa Global de Impostos (ex. ISS %)",
             value=settings_dict.get('tax_rate_percent', '0'),
             keyboard_type=ft.KeyboardType.NUMBER
         )
@@ -71,11 +71,11 @@ class SettingsView(BaseView):
             minutes = hours * 60
             minute_cost = total_monthly / minutes if minutes > 0 else 0
 
-            self.machine_minute_cost_display.value = f"Calculated Machine Minute Cost: R$ {minute_cost:.4f}"
+            self.machine_minute_cost_display.value = f"Custo do Minuto de Máquina Calculado: R$ {minute_cost:.4f}"
             self.page.update()
             return minute_cost
         except ValueError:
-            self.machine_minute_cost_display.value = "Error: Invalid input values."
+            self.machine_minute_cost_display.value = "Erro: Valores de entrada inválidos."
             self.page.update()
             return 0.0
 
@@ -104,17 +104,19 @@ class SettingsView(BaseView):
         conn.close()
 
         # Provide feedback
-        self.page.overlay.append(ft.SnackBar(ft.Text("Settings saved successfully!"), bgcolor=ft.Colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text("Configurações salvas com sucesso!"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.page.update()
 
     def show_add_profile_dialog(self, e):
-        name_input = ft.TextField(label="Profile Name")
-        markup_input = ft.TextField(label="Markup Multiplier", value="2.0", keyboard_type=ft.KeyboardType.NUMBER)
-        margin_input = ft.TextField(label="Profit Margin %", value="100", keyboard_type=ft.KeyboardType.NUMBER)
+        dlg = None
+
+        name_input = ft.TextField(label="Nome do Perfil")
+        markup_input = ft.TextField(label="Multiplicador (Markup)", value="2.0", keyboard_type=ft.KeyboardType.NUMBER)
+        margin_input = ft.TextField(label="Margem de Lucro %", value="100", keyboard_type=ft.KeyboardType.NUMBER)
 
         def save_profile(e):
             if not name_input.value:
-                self.page.overlay.append(ft.SnackBar(ft.Text("Profile name is required"), bgcolor=ft.Colors.RED, open=True))
+                self.page.overlay.append(ft.SnackBar(ft.Text("O nome do perfil é obrigatório"), bgcolor=ft.Colors.RED, open=True))
                 self.page.update()
                 return
 
@@ -125,21 +127,25 @@ class SettingsView(BaseView):
             conn.commit()
             conn.close()
 
-            self.page.pop_dialog()
+            dlg.open = False
             self.load_settings()
             self.update_content()
             self.page.go("/settings") # Refresh the view
 
+        def close_dlg(e):
+            dlg.open = False
+            self.page.update()
+
         dlg = ft.AlertDialog(
-            title=ft.Text("Add Pricing Profile"),
+            title=ft.Text("Adicionar Perfil de Preço"),
             content=ft.Column([name_input, markup_input, margin_input], tight=True),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: self.page.pop_dialog() or self.page.update()),
-                ft.ElevatedButton("Save", on_click=save_profile)
+                ft.TextButton("Cancelar", on_click=close_dlg),
+                ft.ElevatedButton("Salvar", on_click=save_profile)
             ]
         )
-        self.page.show_dialog(dlg)
-
+        self.page.overlay.append(dlg)
+        dlg.open = True
         self.page.update()
 
     def delete_profile(self, profile_id):
@@ -159,7 +165,7 @@ class SettingsView(BaseView):
             profiles_list.controls.append(
                 ft.ListTile(
                     title=ft.Text(p['name']),
-                    subtitle=ft.Text(f"Markup: {p['markup_multiplier']}x | Margin: {p['profit_margin_percent']}%"),
+                    subtitle=ft.Text(f"Markup: {p['markup_multiplier']}x | Margem: {p['profit_margin_percent']}%"),
                     trailing=ft.IconButton(ft.Icons.DELETE, icon_color=ft.Colors.RED_400, on_click=lambda e, pid=p['id']: self.delete_profile(pid))
                 )
             )
@@ -167,27 +173,27 @@ class SettingsView(BaseView):
         self.content_container = ft.Container(
             content=ft.ListView(
                 [
-                    ft.Text("General Settings", size=24, weight=ft.FontWeight.BOLD),
+                    ft.Text("Configurações Gerais", size=24, weight=ft.FontWeight.BOLD),
                     ft.Divider(),
                     ft.Row([self.loss_factor_input, self.labor_cost_input, self.tax_rate_input]),
 
-                    ft.Text("Machine Minute Cost Calculation", size=20, weight=ft.FontWeight.BOLD),
+                    ft.Text("Cálculo do Custo do Minuto de Máquina", size=20, weight=ft.FontWeight.BOLD),
                     ft.Divider(),
                     ft.Row([self.machine_cost_input, self.machine_life_input]),
                     ft.Row([self.energy_kwh_input, self.kwh_cost_input, self.working_hours_input]),
                     ft.Row([self.maintenance_input, self.other_fixed_input]),
-                    ft.ElevatedButton("Recalculate", on_click=self.calculate_machine_cost),
+                    ft.ElevatedButton("Recalcular", on_click=self.calculate_machine_cost),
                     self.machine_minute_cost_display,
 
                     ft.Row([
-                        ft.Text("Pricing Profiles", size=20, weight=ft.FontWeight.BOLD),
+                        ft.Text("Perfis de Preço", size=20, weight=ft.FontWeight.BOLD),
                         ft.IconButton(ft.Icons.ADD_CIRCLE, icon_color=ft.Colors.BLUE_700, on_click=self.show_add_profile_dialog)
                     ]),
                     ft.Divider(),
                     profiles_list,
 
                     ft.Container(height=20),
-                    ft.ElevatedButton("Save All Settings", on_click=self.save_settings, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE, width=200)
+                    ft.ElevatedButton("Salvar Configurações", on_click=self.save_settings, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE, width=200)
                 ],
                 expand=True,
                 spacing=10

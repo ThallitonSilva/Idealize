@@ -8,8 +8,8 @@ class LoginView(ft.View):
         super().__init__("/login", [])
         self._app_page = page
 
-        self.username_input = ft.TextField(label="Username", autofocus=True)
-        self.password_input = ft.TextField(label="Password", password=True, can_reveal_password=True)
+        self.username_input = ft.TextField(label="Usuário", autofocus=True)
+        self.password_input = ft.TextField(label="Senha", password=True, can_reveal_password=True)
         self.error_text = ft.Text(color=ft.Colors.RED_400, visible=False)
 
         self.controls = [
@@ -20,7 +20,7 @@ class LoginView(ft.View):
                         ft.Text("Idealize Personalizados", size=24, weight=ft.FontWeight.BOLD),
                         self.username_input,
                         self.password_input,
-                        ft.ElevatedButton("Login", on_click=self.login, width=200, style=ft.ButtonStyle(bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)),
+                        ft.ElevatedButton("Entrar", on_click=self.login, width=200, style=ft.ButtonStyle(bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)),
                         self.error_text
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
@@ -36,7 +36,7 @@ class LoginView(ft.View):
         password = self.password_input.value
 
         if not username or not password:
-            self.show_error("Please enter username and password.")
+            self.show_error("Por favor, insira o usuário e a senha.")
             return
 
         conn = get_db_connection()
@@ -54,7 +54,7 @@ class LoginView(ft.View):
                 self._app_page.go("/")
                 return
 
-        self.show_error("Invalid credentials.")
+        self.show_error("Credenciais inválidas.")
 
     def show_error(self, message):
         self.error_text.value = message

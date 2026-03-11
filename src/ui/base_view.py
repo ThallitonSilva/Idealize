@@ -27,26 +27,26 @@ class BaseView:
             title=ft.Text(self.title, color=ft.Colors.WHITE),
             bgcolor=ft.Colors.BLUE_700,
             actions=[
-                ft.IconButton(ft.Icons.LOGOUT, on_click=self.logout, tooltip="Logout", icon_color=ft.Colors.WHITE)
+                ft.IconButton(ft.Icons.LOGOUT, on_click=self.logout, tooltip="Sair", icon_color=ft.Colors.WHITE)
             ]
         )
 
         # Build Navigation Rail based on Role
         destinations = [
             ft.NavigationRailDestination(
-                icon=ft.Icons.DASHBOARD_OUTLINED, selected_icon=ft.Icons.DASHBOARD, label="Dashboard"
+                icon=ft.Icons.DASHBOARD_OUTLINED, selected_icon=ft.Icons.DASHBOARD, label="Painel"
             ),
             ft.NavigationRailDestination(
-                icon=ft.Icons.MONEY_OUTLINED, selected_icon=ft.Icons.MONEY, label="Quotes"
+                icon=ft.Icons.MONEY_OUTLINED, selected_icon=ft.Icons.MONEY, label="Orçamentos"
             ),
             ft.NavigationRailDestination(
                 icon=ft.Icons.VIEW_KANBAN_OUTLINED, selected_icon=ft.Icons.VIEW_KANBAN, label="Kanban"
             ),
             ft.NavigationRailDestination(
-                icon=ft.Icons.CATEGORY_OUTLINED, selected_icon=ft.Icons.CATEGORY, label="Catalog"
+                icon=ft.Icons.CATEGORY_OUTLINED, selected_icon=ft.Icons.CATEGORY, label="Catálogo"
             ),
             ft.NavigationRailDestination(
-                icon=ft.Icons.PEOPLE_OUTLINED, selected_icon=ft.Icons.PEOPLE, label="Customers"
+                icon=ft.Icons.PEOPLE_OUTLINED, selected_icon=ft.Icons.PEOPLE, label="Clientes"
             ),
         ]
 
@@ -57,19 +57,19 @@ class BaseView:
         if self.role == 'Admin':
             destinations.extend([
                 ft.NavigationRailDestination(
-                    icon=ft.Icons.LAYERS_OUTLINED, selected_icon=ft.Icons.LAYERS, label="Materials"
+                    icon=ft.Icons.LAYERS_OUTLINED, selected_icon=ft.Icons.LAYERS, label="Materiais"
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.Icons.LOCAL_SHIPPING_OUTLINED, selected_icon=ft.Icons.LOCAL_SHIPPING, label="Suppliers"
+                    icon=ft.Icons.LOCAL_SHIPPING_OUTLINED, selected_icon=ft.Icons.LOCAL_SHIPPING, label="Fornecedores"
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.Icons.SHOPPING_CART_OUTLINED, selected_icon=ft.Icons.SHOPPING_CART, label="Purchases"
+                    icon=ft.Icons.SHOPPING_CART_OUTLINED, selected_icon=ft.Icons.SHOPPING_CART, label="Compras"
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.Icons.ANALYTICS_OUTLINED, selected_icon=ft.Icons.ANALYTICS, label="Reports"
+                    icon=ft.Icons.ANALYTICS_OUTLINED, selected_icon=ft.Icons.ANALYTICS, label="Relatórios"
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icons.SETTINGS, label="Settings"
+                    icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icons.SETTINGS, label="Configurações"
                 ),
             ])
             self.routes_map.extend([

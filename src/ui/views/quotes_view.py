@@ -9,7 +9,7 @@ from reportlab.lib import colors
 
 class QuotesView(BaseView):
     def __init__(self, page: ft.Page):
-        super().__init__(page, "/quotes", "Quotes")
+        super().__init__(page, "/quotes", "Orçamentos")
         self.quotes_list = ft.ListView(expand=True, spacing=10)
 
         # State for new quote creation
@@ -17,6 +17,13 @@ class QuotesView(BaseView):
         self.current_total_cost = 0.0
         self.current_total_price = 0.0
         self.settings = self._load_settings()
+
+        self.status_labels = {
+            'Draft': 'Rascunho',
+            'Sent': 'Enviado',
+            'Approved': 'Aprovado',
+            'Rejected': 'Rejeitado'
+        }
 
         self.load_quotes()
 
@@ -44,7 +51,7 @@ class QuotesView(BaseView):
         conn.close()
 
         if not quotes:
-            self.quotes_list.controls.append(ft.Text("No quotes found.", italic=True))
+            self.quotes_list.controls.append(ft.Text("Nenhum orçamento encontrado.", italic=True))
         else:
             for q in quotes:
 
@@ -53,22 +60,24 @@ class QuotesView(BaseView):
                 elif q['status'] == 'Rejected': status_color = ft.Colors.RED_700
                 elif q['status'] == 'Sent': status_color = ft.Colors.BLUE_700
 
+                display_status = self.status_labels.get(q['status'], q['status'])
+
                 self.quotes_list.controls.append(
                     ft.Card(
                         content=ft.Container(
                             padding=15,
                             content=ft.Column([
                                 ft.Row([
-                                    ft.Text(f"Quote #{q['id']} - {q['customer_name']}", size=16, weight=ft.FontWeight.BOLD),
-                                    ft.Container(content=ft.Text(q['status'], color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD), bgcolor=status_color, padding=5, border_radius=5)
+                                    ft.Text(f"Orçamento #{q['id']} - {q['customer_name']}", size=16, weight=ft.FontWeight.BOLD),
+                                    ft.Container(content=ft.Text(display_status, color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD), bgcolor=status_color, padding=5, border_radius=5)
                                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                                ft.Text(f"Date: {q['created_at']} | Profile: {q['profile_name'] or 'None'}"),
-                                ft.Text(f"Total Cost: R$ {q['total_cost']:.2f} | Final Price: R$ {q['total_price']:.2f}", weight=ft.FontWeight.W_500) if self.role == "Admin" else ft.Text(f"Final Price: R$ {q['total_price']:.2f}", weight=ft.FontWeight.W_500),
+                                ft.Text(f"Data: {q['created_at']} | Perfil: {q['profile_name'] or 'Nenhum'}"),
+                                ft.Text(f"Custo Total: R$ {q['total_cost']:.2f} | Preço Final: R$ {q['total_price']:.2f}", weight=ft.FontWeight.W_500) if self.role == "Admin" else ft.Text(f"Preço Final: R$ {q['total_price']:.2f}", weight=ft.FontWeight.W_500),
                                 ft.Row([
-                                    ft.TextButton("Send", on_click=lambda e, qid=q['id']: self.update_quote_status(qid, 'Sent'), visible=(q['status'] == 'Draft')),
-                                    ft.TextButton("Approve", on_click=lambda e, qid=q['id']: self.approve_quote(qid), visible=(q['status'] in ('Draft', 'Sent'))),
-                                    ft.TextButton("Reject", on_click=lambda e, qid=q['id']: self.update_quote_status(qid, 'Rejected'), visible=(q['status'] in ('Draft', 'Sent'))),
-                                    ft.TextButton("Version", on_click=lambda e, qid=q['id']: self.version_quote(qid)),
+                                    ft.TextButton("Enviar", on_click=lambda e, qid=q['id']: self.update_quote_status(qid, 'Sent'), visible=(q['status'] == 'Draft')),
+                                    ft.TextButton("Aprovar", on_click=lambda e, qid=q['id']: self.approve_quote(qid), visible=(q['status'] in ('Draft', 'Sent'))),
+                                    ft.TextButton("Rejeitar", on_click=lambda e, qid=q['id']: self.update_quote_status(qid, 'Rejected'), visible=(q['status'] in ('Draft', 'Sent'))),
+                                    ft.TextButton("Duplicar", on_click=lambda e, qid=q['id']: self.version_quote(qid)),
                                     ft.TextButton("PDF", on_click=lambda e, qid=q['id']: self.generate_pdf(qid))
                                 ])
                             ])
@@ -83,7 +92,8 @@ class QuotesView(BaseView):
         conn.commit()
         conn.close()
 
-        self.page.overlay.append(ft.SnackBar(ft.Text(f"Quote marked as {new_status}!"), bgcolor=ft.Colors.BLUE_700, open=True))
+        display_status = self.status_labels.get(new_status, new_status)
+        self.page.overlay.append(ft.SnackBar(ft.Text(f"Orçamento marcado como {display_status}!"), bgcolor=ft.Colors.BLUE_700, open=True))
         self.load_quotes()
         self.page.update()
 
@@ -119,7 +129,7 @@ class QuotesView(BaseView):
         conn.commit()
         conn.close()
 
-        self.page.overlay.append(ft.SnackBar(ft.Text(f"New draft version created!"), bgcolor=ft.Colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text(f"Nova versão de rascunho criada!"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.load_quotes()
         self.page.update()
 
@@ -134,7 +144,7 @@ class QuotesView(BaseView):
         conn.commit()
         conn.close()
 
-        self.page.overlay.append(ft.SnackBar(ft.Text("Quote Approved and Order Created!"), bgcolor=ft.Colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text("Orçamento Aprovado e Pedido Criado!"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.load_quotes()
         self.page.update()
 
@@ -164,18 +174,18 @@ class QuotesView(BaseView):
 
         pdf = canvas.Canvas(filepath, pagesize=A4)
         pdf.setFont("Helvetica-Bold", 20)
-        pdf.drawString(50, 800, "Idealize Personalizados - Quote")
+        pdf.drawString(50, 800, "Idealize Personalizados - Orçamento")
 
         pdf.setFont("Helvetica", 12)
-        pdf.drawString(50, 770, f"Quote #{quote['id']} - Date: {quote['created_at']}")
-        pdf.drawString(50, 750, f"Customer: {quote['name']}")
-        pdf.drawString(50, 735, f"Phone: {quote['phone']} | Email: {quote['email']}")
+        pdf.drawString(50, 770, f"Orçamento #{quote['id']} - Data: {quote['created_at']}")
+        pdf.drawString(50, 750, f"Cliente: {quote['name']}")
+        pdf.drawString(50, 735, f"Telefone: {quote['phone']} | E-mail: {quote['email']}")
 
         y = 700
         pdf.setFont("Helvetica-Bold", 12)
-        pdf.drawString(50, y, "Description")
-        pdf.drawString(300, y, "Qty")
-        pdf.drawString(350, y, "Unit Price")
+        pdf.drawString(50, y, "Descrição")
+        pdf.drawString(300, y, "Qtd")
+        pdf.drawString(350, y, "Preço Unit.")
         pdf.drawString(450, y, "Total")
         y -= 20
 
@@ -190,11 +200,11 @@ class QuotesView(BaseView):
 
         y -= 20
         pdf.setFont("Helvetica-Bold", 14)
-        pdf.drawString(300, y, f"FINAL TOTAL: R$ {quote['total_price']:.2f}")
+        pdf.drawString(300, y, f"TOTAL FINAL: R$ {quote['total_price']:.2f}")
 
         pdf.save()
 
-        self.page.overlay.append(ft.SnackBar(ft.Text(f"PDF Generated: {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text(f"PDF Gerado: {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.page.launch_url(f"/{filename}")
         self.page.update()
 
@@ -213,7 +223,7 @@ class QuotesView(BaseView):
         conn.commit()
         conn.close()
 
-        self.page.overlay.append(ft.SnackBar(ft.Text("Item saved to Catalog as a new Product!"), bgcolor=ft.Colors.GREEN_700, open=True))
+        self.page.overlay.append(ft.SnackBar(ft.Text("Item salvo no Catálogo como um novo Produto!"), bgcolor=ft.Colors.GREEN_700, open=True))
         self.page.update()
 
     def show_create_quote_view(self, e):
@@ -234,20 +244,20 @@ class QuotesView(BaseView):
         self.materials_data = {str(m['id']): m['cost_per_cm2'] for m in materials}
 
         customer_dropdown = ft.Dropdown(
-            label="Select Customer",
+            label="Selecionar Cliente",
             options=[ft.dropdown.Option(str(c['id']), c['name']) for c in customers],
             width=300
         )
         profile_dropdown = ft.Dropdown(
-            label="Pricing Profile",
+            label="Perfil de Preço",
             options=[ft.dropdown.Option(str(p['id']), p['name']) for p in profiles],
             width=300
         )
 
         items_listview = ft.ListView(height=200, spacing=5)
 
-        total_cost_text = ft.Text("Total Cost: R$ 0.00", weight=ft.FontWeight.BOLD, color=ft.Colors.RED_700, visible=(self.role == "Admin"))
-        total_price_text = ft.Text("Final Price: R$ 0.00", weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700, size=18)
+        total_cost_text = ft.Text("Custo Total: R$ 0.00", weight=ft.FontWeight.BOLD, color=ft.Colors.RED_700, visible=(self.role == "Admin"))
+        total_price_text = ft.Text("Preço Final: R$ 0.00", weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700, size=18)
 
         def recalc_totals():
             self.current_total_cost = sum(item['item_cost'] * item['quantity'] for item in self.new_quote_items)
@@ -264,22 +274,22 @@ class QuotesView(BaseView):
 
             self.current_total_price = (self.current_total_cost * multiplier) * (1 + tax_rate)
 
-            total_cost_text.value = f"Total Cost: R$ {self.current_total_cost:.2f}"
-            total_price_text.value = f"Final Price: R$ {self.current_total_price:.2f}"
+            total_cost_text.value = f"Custo Total: R$ {self.current_total_cost:.2f}"
+            total_price_text.value = f"Preço Final: R$ {self.current_total_price:.2f}"
             self.page.update()
 
         profile_dropdown.on_change = lambda e: recalc_totals()
 
         def add_item_dialog(e):
             mat_dd = ft.Dropdown(label="Material", options=[ft.dropdown.Option(str(m['id']), m['name']) for m in materials])
-            w_input = ft.TextField(label="Width (cm)", keyboard_type=ft.KeyboardType.NUMBER)
-            h_input = ft.TextField(label="Height (cm)", keyboard_type=ft.KeyboardType.NUMBER)
-            mach_input = ft.TextField(label="Machine Time (min)", keyboard_type=ft.KeyboardType.NUMBER)
-            man_input = ft.TextField(label="Manual Time (min)", keyboard_type=ft.KeyboardType.NUMBER)
-            extra_input = ft.TextField(label="Extra Costs (R$)", keyboard_type=ft.KeyboardType.NUMBER)
-            qty_input = ft.TextField(label="Quantity", value="1", keyboard_type=ft.KeyboardType.NUMBER)
+            w_input = ft.TextField(label="Largura (cm)", keyboard_type=ft.KeyboardType.NUMBER)
+            h_input = ft.TextField(label="Altura (cm)", keyboard_type=ft.KeyboardType.NUMBER)
+            mach_input = ft.TextField(label="Tempo de Máquina (min)", keyboard_type=ft.KeyboardType.NUMBER)
+            man_input = ft.TextField(label="Tempo Manual (min)", keyboard_type=ft.KeyboardType.NUMBER)
+            extra_input = ft.TextField(label="Custos Extras (R$)", keyboard_type=ft.KeyboardType.NUMBER)
+            qty_input = ft.TextField(label="Quantidade", value="1", keyboard_type=ft.KeyboardType.NUMBER)
 
-            live_cost = ft.Text("Item Cost: R$ 0.00", weight=ft.FontWeight.BOLD, visible=(self.role == "Admin"))
+            live_cost = ft.Text("Custo do Item: R$ 0.00", weight=ft.FontWeight.BOLD, visible=(self.role == "Admin"))
 
             def calc_item_cost(e_event):
                 try:
@@ -310,12 +320,14 @@ class QuotesView(BaseView):
             for ctrl in [mat_dd, w_input, h_input, mach_input, man_input, extra_input]:
                 ctrl.on_change = calc_item_cost
 
+            dlg = None
+
             def save_item(e):
                 cost = calc_item_cost(None)
                 qty = int(qty_input.value or 1)
 
                 # Fetch mat name
-                mat_name = next((m['name'] for m in materials if str(m['id']) == mat_dd.value), "Custom Item")
+                mat_name = next((m['name'] for m in materials if str(m['id']) == mat_dd.value), "Item Personalizado")
                 desc = f"{mat_name} ({w_input.value}x{h_input.value}cm)"
 
                 item_dict = {
@@ -335,31 +347,40 @@ class QuotesView(BaseView):
                 items_listview.controls.append(
                     ft.ListTile(
                         title=ft.Text(desc),
-                        subtitle=ft.Text(f"Qty: {qty} | Cost/ea: R$ {cost:.2f}") if self.role == "Admin" else ft.Text(f"Qty: {qty}"),
-                        trailing=ft.IconButton(ft.Icons.SAVE, tooltip="Save as Catalog Product", on_click=lambda e, i=item_dict: self.save_item_to_catalog(i))
+                        subtitle=ft.Text(f"Qtd: {qty} | Custo/un: R$ {cost:.2f}") if self.role == "Admin" else ft.Text(f"Qtd: {qty}"),
+                        trailing=ft.IconButton(ft.Icons.SAVE, tooltip="Salvar como Produto no Catálogo", on_click=lambda e, i=item_dict: self.save_item_to_catalog(i))
                     )
                 )
                 recalc_totals()
 
-                self.page.pop_dialog()
+                dlg.open = False
+                self.page.update()
+
+            def close_add_item(e):
+                dlg.open = False
                 self.page.update()
 
             dlg = ft.AlertDialog(
-                title=ft.Text("Add Item to Quote"),
+                title=ft.Text("Adicionar Item ao Orçamento"),
                 content=ft.Column([mat_dd, ft.Row([w_input, h_input]), ft.Row([mach_input, man_input]), ft.Row([extra_input, qty_input]), live_cost], tight=True),
-                actions=[ft.ElevatedButton("Add", on_click=save_item)]
+                actions=[
+                    ft.TextButton("Cancelar", on_click=close_add_item),
+                    ft.ElevatedButton("Adicionar", on_click=save_item)
+                ]
             )
-            self.page.show_dialog(dlg)
-
+            self.page.overlay.append(dlg)
+            dlg.open = True
             self.page.update()
+
+        main_dlg = None
 
         def save_quote(e):
             if not customer_dropdown.value:
-                self.page.overlay.append(ft.SnackBar(ft.Text("Select a customer!"), bgcolor=ft.Colors.RED_700, open=True))
+                self.page.overlay.append(ft.SnackBar(ft.Text("Selecione um cliente!"), bgcolor=ft.Colors.RED_700, open=True))
                 self.page.update()
                 return
             if not self.new_quote_items:
-                self.page.overlay.append(ft.SnackBar(ft.Text("Add at least one item!"), bgcolor=ft.Colors.RED_700, open=True))
+                self.page.overlay.append(ft.SnackBar(ft.Text("Adicione pelo menos um item!"), bgcolor=ft.Colors.RED_700, open=True))
                 self.page.update()
                 return
 
@@ -382,42 +403,42 @@ class QuotesView(BaseView):
             conn.commit()
             conn.close()
 
-            self.page.pop_dialog()
+            main_dlg.open = False
             self.load_quotes()
             self.page.update()
 
         def cancel_quote(e):
-            self.page.pop_dialog()
+            main_dlg.open = False
             self.page.update()
 
         main_dlg = ft.AlertDialog(
-            title=ft.Text("Create New Quote"),
+            title=ft.Text("Criar Novo Orçamento"),
             content=ft.Container(
                 width=600,
                 content=ft.Column([
                     ft.Row([customer_dropdown, profile_dropdown]),
                     ft.Divider(),
-                    ft.Row([ft.Text("Items", weight=ft.FontWeight.BOLD), ft.ElevatedButton("Add Item", on_click=add_item_dialog, icon=ft.Icons.ADD)]),
+                    ft.Row([ft.Text("Itens", weight=ft.FontWeight.BOLD), ft.ElevatedButton("Adicionar Item", on_click=add_item_dialog, icon=ft.Icons.ADD)]),
                     items_listview,
                     ft.Divider(),
                     ft.Row([total_cost_text, total_price_text], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
                 ], tight=True)
             ),
             actions=[
-                ft.TextButton("Cancel", on_click=cancel_quote),
-                ft.ElevatedButton("Save Quote", on_click=save_quote, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                ft.TextButton("Cancelar", on_click=cancel_quote),
+                ft.ElevatedButton("Salvar Orçamento", on_click=save_quote, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
             ]
         )
-        self.page.show_dialog(main_dlg)
-
+        self.page.overlay.append(main_dlg)
+        main_dlg.open = True
         self.page.update()
 
     def build_content(self):
         return ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Text("Quotes", size=24, weight=ft.FontWeight.BOLD),
-                    ft.ElevatedButton("Create Quote", icon=ft.Icons.ADD, on_click=self.show_create_quote_view, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
+                    ft.Text("Orçamentos", size=24, weight=ft.FontWeight.BOLD),
+                    ft.ElevatedButton("Criar Orçamento", icon=ft.Icons.ADD, on_click=self.show_create_quote_view, bgcolor=ft.Colors.BLUE_700, color=ft.Colors.WHITE)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
                 self.quotes_list
