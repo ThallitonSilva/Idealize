@@ -218,7 +218,7 @@ class QuotesView(BaseView):
         c.execute('''
             INSERT INTO product_components (product_id, material_id, width_cm, height_cm, machine_time_min, manual_time_min, extra_costs)
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (prod_id, item_dict['material_id'], item_dict['width_cm'], item_dict['height_cm'], item_dict['machine_time_min'], item_dict['manual_time_min'], item_dict['extra_costs']))
+        ''', (prod_id, item_dict['material_id'], float(item_dict['width_cm'] or 0), float(item_dict['height_cm'] or 0), float(item_dict['machine_time_min'] or 0), float(item_dict['manual_time_min'] or 0), float(item_dict['extra_costs'] or 0)))
 
         conn.commit()
         conn.close()
@@ -310,7 +310,7 @@ class QuotesView(BaseView):
                     op_cost = (mach_time * mach_cost_min) + (man_time * man_cost_min)
 
                     total = mat_cost + op_cost + extra
-                    live_cost.value = f"Item Cost: R$ {total:.2f}"
+                    live_cost.value = f"Custo do Item: R$ {total:.2f}"
                     self.page.update()
                     return total
                 except Exception:
@@ -398,7 +398,7 @@ class QuotesView(BaseView):
                 c.execute('''
                     INSERT INTO quote_items (quote_id, material_id, description, width_cm, height_cm, machine_time_min, manual_time_min, extra_costs, item_cost, item_price, quantity)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (quote_id, item['material_id'], item['description'], item['width_cm'], item['height_cm'], item['machine_time_min'], item['manual_time_min'], item['extra_costs'], item['item_cost'], item['item_price'], item['quantity']))
+                ''', (quote_id, item['material_id'], item['description'], float(item['width_cm'] or 0), float(item['height_cm'] or 0), float(item['machine_time_min'] or 0), float(item['manual_time_min'] or 0), float(item['extra_costs'] or 0), float(item['item_cost'] or 0), float(item['item_price'] or 0), int(item['quantity'] or 1)))
 
             conn.commit()
             conn.close()

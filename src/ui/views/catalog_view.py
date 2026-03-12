@@ -108,18 +108,18 @@ class CatalogView(BaseView):
                 )
 
     def _calculate_product_cost(self, p):
-        if not p['material_id']: return p['base_price'] or 0.0
+        if not p['material_id']: return float(p['base_price'] or 0.0)
 
-        cost_cm2 = p['cost_per_cm2'] or 0.0
+        cost_cm2 = float(p['cost_per_cm2'] or 0.0)
         loss_factor = float(self.settings.get('global_loss_factor_percent', '10')) / 100.0
         mach_cost_min = float(self.settings.get('machine_minute_cost_cached', '0'))
         man_cost_min = float(self.settings.get('labor_minute_cost', '0'))
 
-        area = (p['width_cm'] or 0) * (p['height_cm'] or 0)
+        area = float(p['width_cm'] or 0) * float(p['height_cm'] or 0)
         mat_cost = area * cost_cm2 * (1 + loss_factor)
 
-        op_cost = ((p['machine_time_min'] or 0) * mach_cost_min) + ((p['manual_time_min'] or 0) * man_cost_min)
-        extra = p['extra_costs'] or 0.0
+        op_cost = (float(p['machine_time_min'] or 0) * mach_cost_min) + (float(p['manual_time_min'] or 0) * man_cost_min)
+        extra = float(p['extra_costs'] or 0.0)
 
         return mat_cost + op_cost + extra
 
@@ -171,6 +171,17 @@ class CatalogView(BaseView):
                 self.page.update()
                 return
 
+            try:
+                w_val = float(w_input.value or 0)
+                h_val = float(h_input.value or 0)
+                mach_val = float(mach_input.value or 0)
+                man_val = float(man_input.value or 0)
+                extra_val = float(extra_input.value or 0)
+            except ValueError:
+                self.page.overlay.append(ft.SnackBar(ft.Text("Valores numéricos inválidos nos campos de medidas/custos."), bgcolor=ft.Colors.RED, open=True))
+                self.page.update()
+                return
+
             conn = get_db_connection()
             c = conn.cursor()
             c.execute("INSERT INTO products (name, description, is_kit) VALUES (?, ?, 0)", (name_input.value, desc_input.value))
@@ -179,7 +190,7 @@ class CatalogView(BaseView):
             c.execute('''
                 INSERT INTO product_components (product_id, material_id, width_cm, height_cm, machine_time_min, manual_time_min, extra_costs)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (prod_id, mat_dd.value, w_input.value, h_input.value, mach_input.value, man_input.value, extra_input.value))
+            ''', (prod_id, mat_dd.value, w_val, h_val, mach_val, man_val, extra_val))
 
             conn.commit()
             conn.close()
@@ -231,13 +242,24 @@ class CatalogView(BaseView):
                 self.page.update()
                 return
 
+            try:
+                w_val = float(w_input.value or 0)
+                h_val = float(h_input.value or 0)
+                mach_val = float(mach_input.value or 0)
+                man_val = float(man_input.value or 0)
+                extra_val = float(extra_input.value or 0)
+            except ValueError:
+                self.page.overlay.append(ft.SnackBar(ft.Text("Valores numéricos inválidos nos campos de medidas/custos."), bgcolor=ft.Colors.RED, open=True))
+                self.page.update()
+                return
+
             conn = get_db_connection()
             c = conn.cursor()
 
             c.execute('''
                 INSERT INTO product_components (product_id, variation_name, material_id, width_cm, height_cm, machine_time_min, manual_time_min, extra_costs)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (product_id, var_name_input.value, mat_dd.value, w_input.value, h_input.value, mach_input.value, man_input.value, extra_input.value))
+            ''', (product_id, var_name_input.value, mat_dd.value, w_val, h_val, mach_val, man_val, extra_val))
 
             conn.commit()
             conn.close()
@@ -373,12 +395,12 @@ class CatalogView(BaseView):
 
         with open(filepath, 'w', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(["Type", "Name", "Description", "Base Cost", "Est. Retail Price"])
+            writer.writerow(["Tipo", "Nome", "Descrição", "Custo Base", "Preço de Venda Est."])
 
             for p in products:
                 cost = self._calculate_product_cost(p)
                 price = cost * 2.0
-                writer.writerow(["Product", p['name'], p['description'] or '', f"{cost:.2f}", f"{price:.2f}"])
+                writer.writerow(["Produto", p['name'], p['description'] or '', f"{cost:.2f}", f"{price:.2f}"])
 
             for k in kits:
                 cost = self._calculate_kit_cost(k['id'])
