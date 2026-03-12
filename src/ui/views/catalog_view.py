@@ -58,7 +58,7 @@ class CatalogView(BaseView):
                 markup = 2.0  # Default display markup
                 display_price = current_cost * markup
 
-                variation_label = p['variation_name'] if p.get('variation_name') else 'Padrão'
+                variation_label = p['variation_name'] if p['variation_name'] else 'Padrão'
                 title_text = f"{p['name']} ({variation_label})"
 
                 self.catalog_list.controls.append(
