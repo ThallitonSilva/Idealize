@@ -99,7 +99,7 @@ class ReportsView(BaseView):
             img_str = base64.b64encode(buf.read()).decode('utf-8')
             plt.close(fig)
 
-            chart_image = ft.Image(src_base64=img_str, width=800, height=400)
+            chart_image = ft.Image(src=img_str, width=800, height=400)
 
         # Supplier Comparison Chart
         supplier_chart_image = None
@@ -125,7 +125,7 @@ class ReportsView(BaseView):
             img_str2 = base64.b64encode(buf2.read()).decode('utf-8')
             plt.close(fig2)
 
-            supplier_chart_image = ft.Image(src_base64=img_str2, width=800, height=400)
+            supplier_chart_image = ft.Image(src=img_str2, width=800, height=400)
 
         def export_csv(e):
             exports_dir = os.path.join(os.getcwd(), "exports")

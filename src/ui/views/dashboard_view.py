@@ -59,7 +59,7 @@ class DashboardView(BaseView):
             img_str = base64.b64encode(buf.read()).decode('utf-8')
             plt.close(fig)
 
-            chart_image = ft.Image(src_base64=img_str, width=500, height=300)
+            chart_image = ft.Image(src=img_str, width=500, height=300)
 
         top_prod_controls = [ft.Text("Top 5 Produtos", weight=ft.FontWeight.BOLD)]
         for i, p in enumerate(top_products):
