@@ -73,7 +73,7 @@ class KanbanView(BaseView):
 
                 self.board_columns[status].append(draggable_card)
 
-    def handle_accept(self, e: ft.DragTargetEvent):
+    def handle_accept(self, e):
         order_id = int(e.page.get_control(e.src_id).data)
         new_status = e.control.data
 
