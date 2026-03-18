@@ -110,7 +110,7 @@ class CustomersView(BaseView):
                 writer.writerow([row['id'], row['name'], row['phone'], row['email'], row['address']])
 
         self.page.overlay.append(ft.SnackBar(ft.Text(f"Exportado para {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
-        self.page.launch_url(f"/{filename}")
+        self.page.run_task(self.page.launch_url, f"/{filename}")
         self.page.update()
 
     def build_content(self):

@@ -412,7 +412,7 @@ class CatalogView(BaseView):
                 writer.writerow(["Kit", k['name'], k['description'] or '', f"{cost:.2f}", f"{price:.2f}"])
 
         self.page.overlay.append(ft.SnackBar(ft.Text(f"Exportado para {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
-        self.page.launch_url(f"/{filename}")
+        self.page.run_task(self.page.launch_url, f"/{filename}")
         self.page.update()
 
     def build_content(self):

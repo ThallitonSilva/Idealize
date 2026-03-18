@@ -142,7 +142,7 @@ class ReportsView(BaseView):
                     writer.writerow([row['name'], f"{row['revenue']:.2f}", f"{row['costs']:.2f}", f"{row['profit']:.2f}"])
 
             self.page.overlay.append(ft.SnackBar(ft.Text(f"Exportado para {filename}"), bgcolor=ft.Colors.GREEN_700, open=True))
-            self.page.launch_url(f"/{filename}")
+            self.page.run_task(self.page.launch_url, f"/{filename}")
             self.page.update()
 
         return ft.Container(
